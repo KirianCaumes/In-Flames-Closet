@@ -1,0 +1,115 @@
+@use '/node_modules/bulma/sass/utilities/mixins.sass';
+@use '/node_modules/bulma/sass/utilities/initial-variables.sass';
+
+.index {
+  .columns {
+    &:last-child {
+      @include mixins.until(initial-variables.$tablet) {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+    }
+
+    .left-column {
+      details {
+        margin: 0 auto;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+
+        summary {
+          cursor: pointer;
+          display: block;
+          padding-left: 1.25rem;
+          position: relative;
+
+          &::before {
+            border-color: transparent transparent transparent #000;
+            border-style: solid;
+            border-width: 0.4rem;
+            content: '';
+            left: 0.2rem;
+            position: absolute;
+            top: 0.33rem;
+            transform: rotate(0);
+            transform-origin: 0.2rem 50%;
+            transition: 0.25s transform ease;
+          }
+        }
+
+        &[open] > summary::before {
+          transform: rotate(90deg);
+        }
+      }
+
+      .left-column-button-reset {
+        path {
+          stroke: #fff;
+        }
+      }
+    }
+
+    .right-column {
+      .right-column-top {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: -2px;
+
+        .right-column-top-left {
+          span {
+            vertical-align: middle;
+          }
+        }
+
+        .right-column-top-right {
+          span {
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: space-evenly;
+
+        .card {
+          width: 200px;
+
+          figure.card-image-container {
+            background-color: initial-variables.$white-ter;
+            border-radius: 0.25rem;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+
+            img {
+              color: transparent;
+              height: 100%;
+              object-fit: contain;
+            }
+          }
+
+          h3 {
+            span:first-child {
+              margin-right: 0.25rem;
+              vertical-align: middle;
+            }
+          }
+
+          h2,
+          h3 {
+            -webkit-box-orient: vertical;
+            /* stylelint-disable-next-line value-no-vendor-prefix */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            padding-bottom: 0.14em;
+          }
+        }
+      }
+    }
+  }
+}

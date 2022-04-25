@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Start",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}",
+            "pathMapping": {
+                "url": "http://localhost:3000/app_in-flames-closet",
+                "path": "${workspaceFolder}"
+            },
+            "preLaunchTask": "front",
+            "runtimeArgs": [
+                "--start-maximized",
+                "--auto-open-devtools-for-tabs"
+            ]
+        }
+    ]
+}

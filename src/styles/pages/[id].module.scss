@@ -1,0 +1,47 @@
+@use '/node_modules/bulma/sass/utilities/mixins.sass';
+@use '/node_modules/bulma/sass/utilities/initial-variables.sass';
+
+.id {
+  nav[class*='breadcrumb'] {
+    ul {
+      flex-wrap: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  h1 {
+    -webkit-box-orient: vertical;
+    /* stylelint-disable-next-line value-no-vendor-prefix */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    padding-bottom: 0.14em;
+  }
+
+  div[class*='image-gallery-content']:not([class*='fullscreen']) {
+    div[class*='image-gallery-slide-wrapper'] {
+      min-height: 300px;
+
+      .image-container {
+        img {
+          height: 500px;
+          width: 500px;
+
+          @include mixins.until(initial-variables.$desktop) {
+            height: auto;
+          }
+        }
+      }
+    }
+  }
+
+  .label {
+    display: inline;
+  }
+
+  div[class*='content'] p:not(:last-child) {
+    margin-bottom: 0.5em;
+  }
+}

@@ -1,0 +1,19 @@
+.gdpr-banner {
+  background-color: rgba(0, 0, 0, 0.85);
+  bottom: 0;
+  display: inline-block;
+  left: 0;
+  padding: 1em;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  z-index: 999;
+
+  p.gdpr-banner-content {
+    color: #fff;
+    display: inline-block;
+    font-size: 1.1em;
+    padding: 0.75em 0;
+    text-align: center;
+  }
+}

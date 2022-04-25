@@ -1,0 +1,19 @@
+version: '3'
+services:
+  in-flames-closet_container:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - ../:/app_in-flames-closet:rw
+    ports:
+      - 5000:5000
+      - 3000:3000
+    networks:
+      - in-flames-closet_network
+
+networks:
+  in-flames-closet_network:
+    driver: 'bridge'

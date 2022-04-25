@@ -1,0 +1,33 @@
+{
+    "overrides": [
+        {
+            "files": [
+                "**/*.scss"
+            ],
+            "customSyntax": "postcss-scss"
+        }
+    ],
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-sass-guidelines"
+    ],
+    "rules": {
+        "max-nesting-depth": 10,
+        "selector-max-compound-selectors": 10,
+        "selector-no-qualifying-type": [
+            true,
+            {
+                "ignore": [
+                    "attribute",
+                    "class",
+                    "id"
+                ]
+            }
+        ],
+        "block-opening-brace-newline-after": "always",
+        "block-closing-brace-newline-before": "always",
+        "max-line-length": 160,
+        "color-function-notation": "legacy",
+        "alpha-value-notation": "number"
+    }
+}

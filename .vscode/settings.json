@@ -1,0 +1,44 @@
+{
+	"editor.formatOnSave": true,
+	"[typescript]": {
+		"editor.tabSize": 4,
+		"editor.detectIndentation": false,
+	},
+	"[typescriptreact]": {
+		"editor.tabSize": 4,
+		"editor.detectIndentation": false,
+	},
+	"[javascript]": {
+		"editor.tabSize": 4,
+		"editor.detectIndentation": false,
+	},
+	"[scss]": {
+		"editor.tabSize": 2,
+		"editor.detectIndentation": false,
+		"editor.defaultFormatter": "stylelint.vscode-stylelint",
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll": true
+	},
+	"eslint.workingDirectories": [
+		".",
+	],
+	"eslint.alwaysShowStatus": true,
+	"css.validate": false,
+	"less.validate": false,
+	"scss.validate": false,
+	"stylelint.validate": [
+		"css",
+		"scss",
+	],
+	"stylelint.configFile": ".stylelintrc.json",
+	"versionlens.suggestions.showOnStartup": true,
+	"terminal.integrated.defaultProfile.linux": "bash",
+	"terminal.integrated.profiles.linux": {
+		"bash": {
+			"path": "/bin/bash",
+			"icon": "terminal-bash"
+		},
+	},
+	"html.format.wrapAttributes": "force-expand-multiline"
+}
