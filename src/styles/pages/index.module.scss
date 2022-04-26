@@ -92,21 +92,25 @@
             }
           }
 
-          h3 {
-            span:first-child {
-              margin-right: 0.25rem;
-              vertical-align: middle;
-            }
-          }
+          div[class*='card-content'] {
+            padding: 1rem;
 
-          h2,
-          h3 {
-            -webkit-box-orient: vertical;
-            /* stylelint-disable-next-line value-no-vendor-prefix */
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-            padding-bottom: 0.14em;
+            h3 {
+              span:first-child {
+                margin-right: 0.25rem;
+                vertical-align: middle;
+              }
+            }
+
+            h2,
+            h3 {
+              -webkit-box-orient: vertical;
+              /* stylelint-disable-next-line value-no-vendor-prefix */
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              overflow: hidden;
+              padding-bottom: 0.14em;
+            }
           }
         }
       }

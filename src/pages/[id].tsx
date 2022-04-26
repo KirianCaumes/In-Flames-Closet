@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import getDatabase, { Item } from 'helpers/database'
 import {
@@ -9,7 +9,7 @@ import Head from 'next/head'
 import ImageGallery from 'react-image-gallery'
 import Link from 'next/link'
 import classNames from 'classnames'
-import { AiFillHome } from 'react-icons/ai'
+import { AiFillHome, AiOutlineShareAlt } from 'react-icons/ai'
 import {
     FaBoxOpen, FaGraduationCap, FaTshirt, FaVestPatches,
 } from 'react-icons/fa'
@@ -19,6 +19,18 @@ import { GiArmoredPants } from 'react-icons/gi'
 
 // eslint-disable-next-line arrow-body-style
 const Index: NextPage<{ item: Item }> = function Index({ item }) {
+    const [canShare, setCanShare] = useState(false)
+
+    const shareData: ShareData = useMemo(() => ({
+        title: item.title,
+        url: `/${item.folderId}`,
+        text: '',
+    }), [item])
+
+    useEffect(() => {
+        setCanShare(navigator.canShare?.(shareData))
+    }, [shareData])
+
     return (
         <>
             <Head>
@@ -82,7 +94,8 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                                 items={item?.imagesId.map(imageId => ({
                                     original: `https://drive.google.com/uc?id=${imageId}`,
                                     thumbnail: `https://drive.google.com/uc?id=${imageId}`,
-                                    originalClass: styles['image-container'],
+                                    originalClass: styles['main-image-container'],
+                                    thumbnailClass: styles['thumb-image-container'],
                                     originalAlt: item?.title,
                                     thumbnailAlt: item?.title,
                                 }))}
@@ -90,8 +103,29 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                             />
                         </Columns.Column>
                         <Columns.Column size="half">
-                            <Heading>
+                            <Heading title={item?.title}>
                                 {item?.title}
+                                {canShare && (
+                                    <>
+                                        {' '}
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                try {
+                                                    await navigator.share(shareData)
+                                                } catch (error) {
+                                                    // eslint-disable-next-line no-console
+                                                    console.error(error)
+                                                }
+                                            }}
+                                            aria-label="Share"
+                                            title="Share"
+                                            className={styles['share-button']}
+                                        >
+                                            <AiOutlineShareAlt />
+                                        </button>
+                                    </>
+                                )}
                             </Heading>
                             <Heading
                                 subtitle
@@ -174,6 +208,13 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                                         {item?.comment || 'None'}
                                     </span>
                                 </p>
+                                <a
+                                    className="is-dark is-small is-size-7"
+                                    // eslint-disable-next-line max-len
+                                    href={encodeURI(`mailto:${process.env.NEXT_PUBLIC_ADMIN_EMAIL}?subject=[In Flames Closet] Problem with ${item.title} (${item.folderId})&body=Hello,\rI think there is a problem with the item "${item.title}" (${item.folderId}:\r`)}
+                                >
+                                    Report a problem
+                                </a>
                             </Content>
                         </Columns.Column>
                     </Columns>

@@ -66,6 +66,11 @@ class MyDocument extends Document {
 
                     <link
                         rel="icon"
+                        href="/favicon.svg"
+                        type="image/svg+xml"
+                    />
+                    <link
+                        rel="icon"
                         type="image/png"
                         sizes="48x48"
                         href="/favicons/favicon-48x48.png"

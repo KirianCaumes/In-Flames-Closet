@@ -125,7 +125,7 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                     <Form.Input
                                         placeholder="Title"
                                         defaultValue={(router.query.title as string)}
-                                        type="text"
+                                        type="search"
                                         size="small"
                                         onChange={ev => {
                                             clearTimeout(titleTimeoutRef.current)
@@ -288,7 +288,7 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                         <Link
                                             href={`/${item.folderId}`}
                                         >
-                                            <a>
+                                            <a title={item?.title}>
                                                 <div className="card-image">
                                                     <figure className={styles['card-image-container']}>
                                                         {/* <Image
@@ -316,6 +316,7 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                                     <Heading
                                                         size={6}
                                                         renderAs="h2"
+                                                        title={item?.title}
                                                     >
                                                         <Link
                                                             href={`/${item.folderId}`}

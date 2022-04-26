@@ -19,15 +19,19 @@ export default function GdprBanner() {
 
     const onRefuse = useCallback(() => {
         setIsVisible(false)
+        Cookie.set('false', ACCEPT_COOKIE_NAME)
         Cookie.remove('_ga')
         Cookie.remove('_gat')
         Cookie.remove('_gid')
     }, [])
 
     useEffect(() => {
-        const hasAccepted = Cookie.get(null, ACCEPT_COOKIE_NAME) === 'true'
-        setIsVisible(!hasAccepted)
-        if (hasAccepted)
+        const cookie = Cookie.get(null, ACCEPT_COOKIE_NAME)
+
+        if (!cookie)
+            setIsVisible(true)
+
+        if (cookie === 'true')
             onAccept()
     }, [onAccept])
 
