@@ -292,7 +292,7 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                                 <div className="card-image">
                                                     <figure className={styles['card-image-container']}>
                                                         {/* <Image
-                                                                src={`http://drive.google.com/uc?export=view&id=${item.imagesId[0]}`}
+                                                                src={`https://drive.google.com/uc?export=view&id=${item.imagesId[0]}`}
                                                                 alt={item.title}
                                                                 layout="fill"
                                                                 decoding="async"
@@ -301,7 +301,7 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                                         <img
                                                             // src={`/api/img?imgId=${item.imagesId[0]}`}
-                                                            src={`http://drive.google.com/uc?export=view&id=${item.imagesId[0]}`}
+                                                            src={`https://drive.google.com/uc?export=view&id=${item.imagesId[0]}`}
                                                             alt={item.title}
                                                             decoding="async"
                                                             loading="lazy"

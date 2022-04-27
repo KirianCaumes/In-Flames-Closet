@@ -19,6 +19,13 @@ export default function Layout({ children }: { children: ReactNode }) {
                                 subtitle
                             >
                                 The history of In Flames through their artworks: clothes, goodies, and more!
+                                {' '}
+                                <span
+                                    role="img"
+                                    aria-label="smiling"
+                                >
+                                    😈
+                                </span>
                             </Heading>
                         </Container>
                     </Hero.Body>

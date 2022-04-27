@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const RANGE_DATA = 'Data!A1:I999'
 const RANGE_PARAMS = 'Params!A1:D999'
-const DEFAULT_OFFSET = 25
+const DEFAULT_OFFSET = 30
 
 interface GoogleApiResponse {
     range: string;

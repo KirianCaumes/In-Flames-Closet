@@ -71,16 +71,24 @@
       .cards {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        justify-content: space-evenly;
+        gap: 1rem;
+        justify-content: space-around;
 
         .card {
-          width: 200px;
+          width: 160px;
+
+          @include mixins.until(initial-variables.$tablet) {
+            width: 140px;
+
+            figure.card-image-container {
+              height: 140px;
+            }
+          }
 
           figure.card-image-container {
-            background-color: initial-variables.$white-ter;
+            background-color: initial-variables.$grey-lightest;
             border-radius: 0.25rem;
-            height: 200px;
+            height: 160px;
             overflow: hidden;
             position: relative;
             text-align: center;
