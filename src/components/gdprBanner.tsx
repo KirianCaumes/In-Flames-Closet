@@ -11,7 +11,7 @@ export default function GdprBanner() {
     const [isVisible, setIsVisible] = useState(false)
 
     const onAccept = useCallback(() => {
-        ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID as string)
+        ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID as string, { gaOptions: { cookieFlags: 'SameSite=None;Secure' } })
         ReactGA.send('pageview')
         Cookie.set('true', ACCEPT_COOKIE_NAME)
         setIsVisible(false)
