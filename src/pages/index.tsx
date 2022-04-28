@@ -22,7 +22,6 @@ import { ParsedUrlQueryInput } from 'querystring'
 import { GiArmoredPants } from 'react-icons/gi'
 import Pagination from 'components/pagination'
 import { GrPowerReset } from 'react-icons/gr'
-import Image from 'next/image'
 
 const ARRAY_SEPARATOR = ' - '
 
@@ -292,10 +291,13 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                             <a title={item?.title}>
                                                 <div className="card-image">
                                                     <figure className={styles['card-image-container']}>
-                                                        <Image
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img
+                                                            // src={`/api/img?imgId=${item.imagesId[0]}`}
                                                             src={`https://drive.google.com/uc?export=view&id=${item.imagesId[0]}`}
                                                             alt={item.title}
-                                                            layout="fill"
+                                                            decoding="async"
+                                                            loading="lazy"
                                                         />
                                                     </figure>
                                                 </div>
