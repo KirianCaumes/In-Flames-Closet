@@ -8,22 +8,24 @@ const Cookie = {
     /**
      * Set cookie
      */
-    set(value: string, key: string) {
+    set(value: string, key: string, options?: cookie.CookieAttributes) {
         if (typeof window !== 'undefined' && value)
             cookie.set(key, value, {
                 expires: 1,
                 path: '/',
                 secure: process.env.NODE_ENV !== 'development',
                 sameSite: 'lax',
+                ...options,
             })
     },
     /**
      * Remove cookie
      */
-    remove(key: string) {
+    remove(key: string, options?: cookie.CookieAttributes) {
         if (typeof window !== 'undefined')
             cookie.remove(key, {
                 expires: 1,
+                ...options,
             })
     },
     /**

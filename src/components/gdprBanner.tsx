@@ -13,13 +13,13 @@ export default function GdprBanner() {
     const onAccept = useCallback(() => {
         ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID as string, { gaOptions: { cookieFlags: 'SameSite=None;Secure' } })
         ReactGA.send('pageview')
-        Cookie.set('true', ACCEPT_COOKIE_NAME)
+        Cookie.set('true', ACCEPT_COOKIE_NAME, { expires: 99999 })
         setIsVisible(false)
     }, [])
 
     const onRefuse = useCallback(() => {
         setIsVisible(false)
-        Cookie.set('false', ACCEPT_COOKIE_NAME)
+        Cookie.set('false', ACCEPT_COOKIE_NAME, { expires: 99999 })
         Cookie.remove('_ga')
         Cookie.remove('_gat')
         Cookie.remove('_gid')
