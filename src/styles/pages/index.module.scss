@@ -39,6 +39,10 @@
         &[open] > summary::before {
           transform: rotate(90deg);
         }
+
+        span[class*='icon'] {
+          vertical-align: text-top;
+        }
       }
 
       .left-column-button-reset {

@@ -6,18 +6,13 @@ import {
 } from 'react-bulma-components'
 import styles from 'styles/pages/[id].module.scss'
 import Head from 'next/head'
-import ImageGallery from 'react-image-gallery'
 import Link from 'next/link'
 import classNames from 'classnames'
 import { AiFillHome, AiOutlineShareAlt } from 'react-icons/ai'
-import {
-    FaBoxOpen, FaGraduationCap, FaTshirt, FaVestPatches,
-} from 'react-icons/fa'
-import { IoShirtSharp } from 'react-icons/io5'
-import { MdInsertPhoto } from 'react-icons/md'
-import { GiArmoredPants } from 'react-icons/gi'
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
+import { Carousel } from 'react-responsive-carousel'
+import CategoryIcon from 'components/categoryIcon'
 
-// eslint-disable-next-line arrow-body-style
 const Index: NextPage<{ item: Item }> = function Index({ item }) {
     const [canShare, setCanShare] = useState(false)
 
@@ -75,14 +70,7 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                         <Breadcrumb.Item active>
                             <a>
                                 <Icon>
-                                    {item?.category === 'T-Shirt' && <IoShirtSharp />}
-                                    {item?.category === 'Sweater' && <FaTshirt />}
-                                    {item?.category === 'Long Sleeve' && <FaTshirt />}
-                                    {item?.category === 'Poster' && <MdInsertPhoto />}
-                                    {item?.category === 'Patch' && <FaVestPatches />}
-                                    {item?.category === 'Trouser' && <GiArmoredPants />}
-                                    {item?.category === 'Cap' && <FaGraduationCap />}
-                                    {(item?.category === 'Other' || !item?.category) && <FaBoxOpen />}
+                                    <CategoryIcon name={item?.category} />
                                 </Icon>
                                 <span>{item?.title || 'Unknown'}</span>
                             </a>
@@ -90,17 +78,27 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                     </Breadcrumb>
                     <Columns>
                         <Columns.Column size="half">
-                            <ImageGallery
-                                items={item?.imagesId.map(imageId => ({
-                                    original: `https://drive.google.com/uc?id=${imageId}`,
-                                    thumbnail: `https://drive.google.com/uc?id=${imageId}`,
-                                    originalClass: styles['main-image-container'],
-                                    thumbnailClass: styles['thumb-image-container'],
-                                    originalAlt: item?.title,
-                                    thumbnailAlt: item?.title,
-                                }))}
-                                showPlayButton={false}
-                            />
+                            <Carousel
+                                renderItem={el => <div className={styles['main-image-container']}>{el}</div>}
+                            >
+                                {item?.imagesId.map(imageId => (
+                                    <React.Fragment key={imageId}>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={`https://drive.google.com/uc?id=${imageId}`}
+                                            alt={item?.title}
+                                            className={styles['main-image-background']}
+                                        />
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={`https://drive.google.com/uc?id=${imageId}`}
+                                            alt={item?.title}
+                                            className={styles['main-image']}
+                                        />
+                                        {/* <p className="legend">{item?.title}</p> */}
+                                    </React.Fragment>
+                                ))}
+                            </Carousel>
                         </Columns.Column>
                         <Columns.Column size="half">
                             <Heading title={item?.title}>

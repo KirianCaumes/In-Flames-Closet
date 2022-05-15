@@ -29,28 +29,23 @@
     padding-bottom: 0.14em;
   }
 
-  div[class*='image-gallery-content']:not([class*='fullscreen']) {
-    .thumb-image-container {
-      min-height: 50px;
-
-      img {
-        color: transparent;
-      }
+  .main-image-container {
+    img.main-image-background {
+      display: block;
+      filter: blur(5px);
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: -1;
     }
 
-    div[class*='image-gallery-slide-wrapper'] {
-      min-height: 300px;
+    img.main-image {
+      color: transparent;
+      height: 500px;
+      width: auto;
 
-      .main-image-container {
-        img {
-          color: transparent;
-          height: 500px;
-          width: 500px;
-
-          @include mixins.until(initial-variables.$desktop) {
-            height: auto;
-          }
-        }
+      @include mixins.until(initial-variables.$desktop) {
+        height: auto;
       }
     }
   }

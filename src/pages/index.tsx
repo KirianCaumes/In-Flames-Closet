@@ -13,15 +13,10 @@ import styles from 'styles/pages/index.module.scss'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { AiFillHome } from 'react-icons/ai'
-import {
-    FaBoxOpen, FaGraduationCap, FaTshirt, FaVestPatches,
-} from 'react-icons/fa'
-import { IoShirtSharp } from 'react-icons/io5'
-import { MdInsertPhoto } from 'react-icons/md'
 import { ParsedUrlQueryInput } from 'querystring'
-import { GiArmoredPants } from 'react-icons/gi'
 import Pagination from 'components/pagination'
 import { GrPowerReset } from 'react-icons/gr'
+import CategoryIcon from 'components/categoryIcon'
 
 const ARRAY_SEPARATOR = ' - '
 
@@ -251,7 +246,12 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                                     router.push({ pathname: '/', query }, undefined, { scroll: false })
                                                 }}
                                             >
-                                                {category}
+                                                <span>
+                                                    {category}
+                                                </span>
+                                                <Icon>
+                                                    <CategoryIcon name={category} />
+                                                </Icon>
                                             </Form.Checkbox>
                                         </Form.Control>
                                     ))}
@@ -325,14 +325,7 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                                         renderAs="h3"
                                                     >
                                                         <span>
-                                                            {item?.category === 'T-Shirt' && <IoShirtSharp />}
-                                                            {item?.category === 'Sweater' && <FaTshirt />}
-                                                            {item?.category === 'Long Sleeve' && <FaTshirt />}
-                                                            {item?.category === 'Poster' && <MdInsertPhoto />}
-                                                            {item?.category === 'Patch' && <FaVestPatches />}
-                                                            {item?.category === 'Trouser' && <GiArmoredPants />}
-                                                            {item?.category === 'Cap' && <FaGraduationCap />}
-                                                            {(item?.category === 'Other' || !item?.category) && <FaBoxOpen />}
+                                                            <CategoryIcon name={item?.category} />
                                                         </span>
                                                         <span>{item?.category || 'Unknown'}</span>
                                                     </Heading>
