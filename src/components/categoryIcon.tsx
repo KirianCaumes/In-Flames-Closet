@@ -6,6 +6,7 @@ import {
 import { GiArmoredPants } from 'react-icons/gi'
 import { IoShirtSharp } from 'react-icons/io5'
 import { MdInsertPhoto } from 'react-icons/md'
+import { BsTriangleFill } from 'react-icons/bs'
 
 /**
  * CategoryIcon
@@ -32,6 +33,8 @@ export default function CategoryIcon({ name = 'Other' }: { name: string }) {
             return <AiOutlineFileImage />
         case 'Magazine Poster':
             return <AiOutlineFileImage />
+        case 'Pick':
+            return <BsTriangleFill />
         default:
             return <FaBoxOpen />
     }

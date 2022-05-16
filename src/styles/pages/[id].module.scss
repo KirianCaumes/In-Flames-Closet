@@ -30,23 +30,29 @@
   }
 
   .main-image-container {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    justify-content: center;
+    position: relative;
+
     img.main-image-background {
       display: block;
-      filter: blur(5px);
+      filter: blur(4px);
+      height: 100%;
+      object-fit: cover;
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
+      width: 100%;
       z-index: -1;
     }
 
     img.main-image {
       color: transparent;
-      height: 500px;
-      width: auto;
-
-      @include mixins.until(initial-variables.$desktop) {
-        height: auto;
-      }
+      height: 100%;
+      object-fit: contain;
+      width: 100%;
     }
   }
 
