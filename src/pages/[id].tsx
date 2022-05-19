@@ -80,6 +80,8 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                         <Columns.Column size="half">
                             <Carousel
                                 renderItem={el => <div className={styles['main-image-container']}>{el}</div>}
+                                preventMovementUntilSwipeScrollTolerance
+                                swipeScrollTolerance={30}
                             >
                                 {item?.imagesId.map(imageId => (
                                     <React.Fragment key={imageId}>
