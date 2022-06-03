@@ -4,6 +4,9 @@ import { FaCookieBite, FaTimes } from 'react-icons/fa'
 import Cookie from 'helpers/cookie'
 import styles from 'styles/components/gdpr-banner.module.scss'
 import ReactGA from 'react-ga4'
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig()
 
 const ACCEPT_COOKIE_NAME = 'accept_cookies'
 
@@ -11,7 +14,7 @@ export default function GdprBanner() {
     const [isVisible, setIsVisible] = useState(false)
 
     const onAccept = useCallback(() => {
-        ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID as string, { gaOptions: { cookieFlags: 'SameSite=None;Secure' } })
+        ReactGA.initialize(publicRuntimeConfig.googleAnalyticsId, { gaOptions: { cookieFlags: 'SameSite=None;Secure' } })
         ReactGA.send('pageview')
         Cookie.set('true', ACCEPT_COOKIE_NAME, { expires: 99999 })
         setIsVisible(false)

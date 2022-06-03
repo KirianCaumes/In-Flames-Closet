@@ -12,6 +12,9 @@ import { AiFillHome, AiOutlineShareAlt } from 'react-icons/ai'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { Carousel } from 'react-responsive-carousel'
 import CategoryIcon from 'components/categoryIcon'
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig()
 
 const Index: NextPage<{ item: Item }> = function Index({ item }) {
     const [canShare, setCanShare] = useState(false)
@@ -37,6 +40,43 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                 <meta
                     name="description"
                     content={[item?.title, item?.category, item?.year].filter(x => x).join(' - ')}
+                />
+                <meta
+                    property="og:title"
+                    content={`${item?.title || 'Unknown'} - In Flames Closet`}
+                />
+                <meta
+                    property="og:description"
+                    content={[item?.title, item?.category, item?.year].filter(x => x).join(' - ')}
+                />
+                <meta
+                    property="og:image"
+                    content={`http://drive.google.com/uc?export=view&id=${item?.imagesId[0]}`}
+                />
+                <meta
+                    property="og:url"
+                    content={`${process.env.SITE_URL}/${item.folderId}`}
+                />
+
+                <meta
+                    property="twitter:title"
+                    content={`${item?.title || 'Unknown'} - In Flames Closet`}
+                />
+                <meta
+                    property="twitter:description"
+                    content={[item?.title, item?.category, item?.year].filter(x => x).join(' - ')}
+                />
+                <meta
+                    property="twitter:card"
+                    content="summary_large_image"
+                />
+                <meta
+                    property="twitter:image"
+                    content={`http://drive.google.com/uc?export=view&id=${item?.imagesId[0]}`}
+                />
+                <meta
+                    property="twitter:url"
+                    content={`${process.env.SITE_URL}/${item.folderId}`}
                 />
                 <script
                     type="application/ld+json"
@@ -211,7 +251,7 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                                 <a
                                     className="is-dark is-small is-size-7"
                                     // eslint-disable-next-line max-len
-                                    href={encodeURI(`mailto:${process.env.NEXT_PUBLIC_ADMIN_EMAIL}?subject=[In Flames Closet] Problem with ${item.title} (${item.folderId})&body=Hello,\rI think there is a problem with the item "${item.title}" (${item.folderId}:\r`)}
+                                    href={encodeURI(`mailto:${publicRuntimeConfig.adminEmail}?subject=[In Flames Closet] Problem with ${item.title} (${item.folderId})&body=Hello,\rI think there is a problem with the item "${item.title}" (${item.folderId}:\r`)}
                                 >
                                     Report a problem
                                 </a>
