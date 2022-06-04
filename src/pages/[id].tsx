@@ -123,17 +123,17 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                                 preventMovementUntilSwipeScrollTolerance
                                 swipeScrollTolerance={30}
                             >
-                                {item?.imagesId.map(imageId => (
+                                {Object.values(item?.imagesId).map(imageId => (
                                     <React.Fragment key={imageId}>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={`https://drive.google.com/uc?id=${imageId}`}
+                                            src={`https://i.ibb.co/${imageId}`}
                                             alt={item?.title}
                                             className={styles['main-image-background']}
                                         />
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={`https://drive.google.com/uc?id=${imageId}`}
+                                            src={`https://i.ibb.co/${imageId}`}
                                             alt={item?.title}
                                             className={styles['main-image']}
                                         />
