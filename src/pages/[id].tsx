@@ -51,7 +51,7 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                 />
                 <meta
                     property="og:image"
-                    content={`http://drive.google.com/uc?export=view&id=${item?.imagesId[0]}`}
+                    content={`${process.env.SITE_URL}/image/${item.folderId}/${item.imagesId[0]}`}
                 />
                 <meta
                     property="og:url"
@@ -72,7 +72,7 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                 />
                 <meta
                     property="twitter:image"
-                    content={`http://drive.google.com/uc?export=view&id=${item?.imagesId[0]}`}
+                    content={`${process.env.SITE_URL}/image/${item.folderId}/${item.imagesId[0]}`}
                 />
                 <meta
                     property="twitter:url"
@@ -87,7 +87,7 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                             '@type': 'Product',
                             name: item?.title,
                             description: item?.comment,
-                            image: `http://drive.google.com/uc?export=view&id=${item?.imagesId[0]}`,
+                            image: `${process.env.SITE_URL}/image/${item.folderId}/${item.imagesId[0]}`,
                             category: item?.category,
                             releaseDate: item?.year ? `${item.year}-01-01` : undefined,
                         }),
@@ -123,17 +123,17 @@ const Index: NextPage<{ item: Item }> = function Index({ item }) {
                                 preventMovementUntilSwipeScrollTolerance
                                 swipeScrollTolerance={30}
                             >
-                                {Object.values(item?.imagesId).map(imageId => (
+                                {item?.imagesId.map(imageId => (
                                     <React.Fragment key={imageId}>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={`https://i.ibb.co/${imageId}`}
+                                            src={`/image/${item.folderId}/${imageId}`}
                                             alt={item?.title}
                                             className={styles['main-image-background']}
                                         />
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={`https://i.ibb.co/${imageId}`}
+                                            src={`/image/${item.folderId}/${imageId}`}
                                             alt={item?.title}
                                             className={styles['main-image']}
                                         />

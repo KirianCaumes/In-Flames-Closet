@@ -12,7 +12,7 @@ interface GoogleApiResponse {
 
 export type Item = {
     folderId: string;
-    imagesId: Record<string, string>;
+    imagesId: string[];
     title: string;
     category: string;
     link: string;
@@ -50,17 +50,6 @@ export enum ESort {
     OLD = 'old',
 }
 
-const parseJson = (str: string) => {
-    try {
-        const res = JSON.parse(str)
-        if (res && typeof res === 'object')
-            return res
-        return str
-    } catch (error) {
-        return str
-    }
-}
-
 class Database {
     private items: Item[] = []
 
@@ -86,7 +75,7 @@ class Database {
             this.items = result.data?.values
                 ?.map(value => ({
                     folderId: value[0] || '',
-                    imagesId: parseJson(value[1]) || {},
+                    imagesId: value[1]?.split(';') ?? [],
                     title: value[2]?.trim() || '',
                     category: value[3] || '',
                     link: value[4] || '',
