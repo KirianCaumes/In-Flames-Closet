@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 const RANGE_DATA = 'Data!A1:I999'
 const RANGE_PARAMS = 'Params!A1:D999'
@@ -88,7 +88,7 @@ class Database {
                 ?.reverse()
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error(error)
+            console.error((error as AxiosError).message)
         }
     }
 
@@ -117,7 +117,7 @@ class Database {
             this.categories = params.map(x => x.category).filter((value, index, self) => value && self.indexOf(value) === index)
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error(error)
+            console.error((error as AxiosError).message)
         }
     }
 

@@ -1,4 +1,5 @@
 import React, {
+    useEffect,
     useMemo, useRef, useState,
 } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
@@ -29,11 +30,34 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
     const [isYearsOpen, setIsYearsOpen] = useState(false)
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
+    const [title, setTitle] = useState((router.query.title as string) || '')
+
     const selectedLinks = useMemo(() => (router.query.links as string)?.split(ARRAY_SEPARATOR).filter(x => x) ?? [], [router.query.links])
     const selectedYears = useMemo(() => (router.query.years as string)?.split(ARRAY_SEPARATOR).filter(x => x) ?? [], [router.query.years])
     const selectedCategories = useMemo(() => (router.query.categories as string)?.split(ARRAY_SEPARATOR).filter(x => x) ?? [], [router.query.categories])
 
     const titleTimeoutRef = useRef<NodeJS.Timeout>(0 as any)
+
+    // Update title in query when title state change, delayed with a debounce function
+    useEffect(() => {
+        clearTimeout(titleTimeoutRef.current)
+        titleTimeoutRef.current = setTimeout(() => {
+            const query: ParsedUrlQueryInput = {
+                ...router.query,
+                page: 1,
+                title,
+            }
+            if (!title)
+                delete query.title
+            router.push({ pathname: '/', query }, undefined, { scroll: false })
+        }, 250)
+    }, [title]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Update title when query change, only used for navigation back
+    useEffect(() => {
+        if ((router.query.title as string) !== title)
+            setTitle(router.query.title as string || '')
+    }, [router.query.title]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
@@ -119,22 +143,10 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                 <Form.Control>
                                     <Form.Input
                                         placeholder="Title"
-                                        defaultValue={(router.query.title as string)}
+                                        value={title}
                                         type="search"
                                         size="small"
-                                        onChange={ev => {
-                                            clearTimeout(titleTimeoutRef.current)
-                                            titleTimeoutRef.current = setTimeout(() => {
-                                                const query: ParsedUrlQueryInput = {
-                                                    ...router.query,
-                                                    page: 1,
-                                                    title: ev.target.value,
-                                                }
-                                                if (!ev.target.value)
-                                                    delete query.title
-                                                router.push({ pathname: '/', query }, undefined, { scroll: false })
-                                            }, 250)
-                                        }}
+                                        onChange={ev => setTitle(ev.target.value)}
                                     />
                                 </Form.Control>
                             </Form.Field>
@@ -259,10 +271,15 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                             </details>
                             <Button
                                 className={styles['left-column-button-reset']}
-                                onClick={() => router.push({
-                                    pathname: '/',
-                                    query: {},
-                                }, undefined, { scroll: false })}
+                                onClick={() => {
+                                    router.push({
+                                        pathname: '/',
+                                        query: {},
+                                    })
+                                    setIsLinksOpen(true)
+                                    setIsYearsOpen(false)
+                                    setIsCategoriesOpen(false)
+                                }}
                                 size="small"
                                 color="dark"
                             >

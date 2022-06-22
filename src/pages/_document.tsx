@@ -83,7 +83,7 @@ class MyDocument extends Document {
                     />
                     <link
                         rel="manifest"
-                        href="/favicons/site.webmanifest"
+                        href="/site.webmanifest"
                     />
                     <meta
                         name="msapplication-TileColor"
