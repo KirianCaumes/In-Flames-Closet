@@ -4,6 +4,9 @@ import 'styles/index.scss'
 import Layout from 'components/layout'
 import GdprBanner from 'components/gdprBanner'
 
+/**
+ * My app
+ */
 function MyApp({ Component, pageProps }: AppProps) {
     return (
         <>

@@ -7,6 +7,9 @@ import type { IncomingMessage } from 'http'
 const Cookie = {
     /**
      * Set cookie
+     * @param value value
+     * @param key key
+     * @param options options
      */
     set(value: string, key: string, options?: cookie.CookieAttributes) {
         if (typeof window !== 'undefined' && value)
@@ -20,6 +23,8 @@ const Cookie = {
     },
     /**
      * Remove cookie
+     * @param key key
+     * @param options options
      */
     remove(key: string, options?: cookie.CookieAttributes) {
         if (typeof window !== 'undefined')
@@ -30,6 +35,8 @@ const Cookie = {
     },
     /**
      * Get cookie
+     * @param req req
+     * @param key key
      */
     get(req: IncomingMessage | null, key: string) {
         return typeof window !== 'undefined'

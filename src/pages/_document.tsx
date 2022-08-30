@@ -3,8 +3,14 @@ import Document, {
     Head, Html, Main, NextScript,
 } from 'next/document'
 
+/**
+ * My document
+ */
 class MyDocument extends Document {
     // eslint-disable-next-line class-methods-use-this
+    /**
+     * Render
+     */
     render() {
         return (
             <Html>

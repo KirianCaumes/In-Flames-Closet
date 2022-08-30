@@ -4,7 +4,13 @@ import {
 } from 'react-bulma-components'
 import styles from 'styles/components/layout.module.scss'
 
-export default function Layout({ children }: { children: ReactNode }) {
+/**
+ * Layout
+ */
+export default function Layout({ children }: {
+    /** Children */
+    children: ReactNode
+}) {
     return (
         <div className={styles.layout}>
             <header className={styles['layout-hero']}>

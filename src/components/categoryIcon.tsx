@@ -11,7 +11,10 @@ import { BsTriangleFill } from 'react-icons/bs'
 /**
  * CategoryIcon
  */
-export default function CategoryIcon({ name = 'Other' }: { name: string }) {
+export default function CategoryIcon({ name = 'Other' }: {
+    /** Name */
+    name: string
+}) {
     switch (name) {
         case 'T-Shirt':
             return <IoShirtSharp />

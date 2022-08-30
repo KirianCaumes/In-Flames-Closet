@@ -4,45 +4,71 @@ const RANGE_DATA = 'Data!A1:I999'
 const RANGE_PARAMS = 'Params!A1:D999'
 const DEFAULT_OFFSET = 30
 
-interface GoogleApiResponse {
-    range: string;
-    majorDimension: string;
-    values: string[][];
+type GoogleApiResponseType = {
+    /** Range */
+    range: string
+    /** MajorDimension */
+    majorDimension: string
+    /** Values */
+    values: string[][]
 }
 
-export type Item = {
-    folderId: string;
-    imagesId: string[];
-    title: string;
-    category: string;
-    link: string;
-    year: string;
-    source: string;
-    official: string;
-    comment: string;
+export type ItemType = {
+    /** FolderId */
+    folderId: string
+    /** ImagesId */
+    imagesId: string[]
+    /** Title */
+    title: string
+    /** Category */
+    category: string
+    /** Link */
+    link: string
+    /** Year */
+    year: string
+    /** Source */
+    source: string
+    /** Official */
+    official: string
+    /** Comment */
+    comment: string
 }
 
-export type ItemsResult = {
-    items: Item[];
-    total: number;
-    pagesNumber: number;
-    limit: number;
+export type ItemsResultType = {
+    /** Items */
+    items: ItemType[]
+    /** Total */
+    total: number
+    /** TotalPages */
+    totalPages: number
+    /** Limit */
+    limit: number
 }
 
-export type Params = {
-    links: string[];
-    years: string[];
-    categories: string[];
+export type ParamsType = {
+    /** Links */
+    links: string[]
+    /** Years */
+    years: string[]
+    /** Categories */
+    categories: string[]
 }
 
-export type Filters = {
-    offset?: number;
-    links: string[];
-    years: string[];
-    categories: string[];
-    title: string;
-    page: number;
-    sort: ESort;
+export type FiltersType = {
+    /** Offset */
+    offset?: number
+    /** Links */
+    links: string[]
+    /** Years */
+    years: string[]
+    /** Categories */
+    categories: string[]
+    /** Title */
+    title: string
+    /** Page */
+    page: number
+    /** Sort */
+    sort: ESort
 }
 
 export enum ESort {
@@ -50,8 +76,11 @@ export enum ESort {
     OLD = 'old',
 }
 
+/**
+ * Database
+ */
 class Database {
-    private items: Item[] = []
+    private items: ItemType[] = []
 
     private links: string[] = []
 
@@ -64,7 +93,7 @@ class Database {
      */
     private async syncItem() {
         try {
-            const result = await axios.request<GoogleApiResponse>({
+            const result = await axios.request<GoogleApiResponseType>({
                 method: 'GET',
                 url: `https://sheets.googleapis.com/v4/spreadsheets/${process.env.GOOGLE_SHEET_ID}/values/${RANGE_DATA}`,
                 params: {
@@ -97,7 +126,7 @@ class Database {
      */
     private async syncParams() {
         try {
-            const result = await axios.request<GoogleApiResponse>({
+            const result = await axios.request<GoogleApiResponseType>({
                 method: 'GET',
                 url: `https://sheets.googleapis.com/v4/spreadsheets/${process.env.GOOGLE_SHEET_ID}/values/${RANGE_PARAMS}`,
                 params: {
@@ -152,8 +181,7 @@ class Database {
         years = [],
         sort = ESort.NEW,
         title = '',
-    }: Filters)
-        : Promise<ItemsResult> {
+    }: FiltersType): Promise<ItemsResultType> {
         await this.applyItemSync()
 
         const itemsFiltered = this.items
@@ -176,15 +204,16 @@ class Database {
         return {
             items: itemsFiltered.slice(offset * (page - 1), offset * page),
             total: itemsFiltered.length,
-            pagesNumber: Math.ceil(itemsFiltered.length / offset),
+            totalPages: Math.ceil(itemsFiltered.length / offset),
             limit: offset,
         }
     }
 
     /**
      * Get a items by id
+     * @param id Id
      */
-    public async getById(id: string): Promise<Item | null> {
+    public async getById(id: string): Promise<ItemType | null> {
         await this.applyItemSync()
 
         return this.items.find(item => item.folderId === id) ?? null
@@ -193,7 +222,7 @@ class Database {
     /**
      * Get params
      */
-    public async getParams(): Promise<Params> {
+    public async getParams(): Promise<ParamsType> {
         await this.applyParamSync()
 
         return {
@@ -206,6 +235,9 @@ class Database {
 
 let databaseInstance: Database
 
+/**
+ * Get database
+ */
 export default function getDatabase() {
     if (!databaseInstance)
         databaseInstance = new Database()

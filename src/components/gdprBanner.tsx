@@ -10,6 +10,9 @@ const { publicRuntimeConfig } = getConfig()
 
 const ACCEPT_COOKIE_NAME = 'accept_cookies'
 
+/**
+ * Gdpr Banner
+ */
 export default function GdprBanner() {
     const [isVisible, setIsVisible] = useState(false)
 

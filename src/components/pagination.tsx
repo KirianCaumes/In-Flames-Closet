@@ -1,27 +1,32 @@
 import React from 'react'
 import classNames from 'classnames'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 
 declare module 'react' {
+    // eslint-disable-next-line
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-        disabled?: boolean;
+        /** Disabled */
+        disabled?: boolean
     }
 }
 
 /**
  * Pagination
  */
-export default function Pagination({ current = 1, total = 1 }: { current: number; total: number }) {
-    const router = useRouter()
-
+export default function Pagination({ page = 1, totalPages = 1, setPage }: {
+    /** page */
+    page: number
+    /** totalPages */
+    totalPages: number
+    /** Set page */
+    setPage: (newPage: number) => void
+}) {
     return (
         <nav
             className="pagination"
             role="navigation"
             aria-label="pagination"
         >
-            {current <= 1
+            {page <= 1
                 ? (
                     <a
                         className="pagination-previous"
@@ -31,22 +36,17 @@ export default function Pagination({ current = 1, total = 1 }: { current: number
                     </a>
                 )
                 : (
-                    <Link
-                        href={{
-                            query: {
-                                ...router.query,
-                                page: current - 1,
-                            },
-                        }}
+                    <a
+                        onClick={() => setPage(page - 1)}
+                        onKeyDown={() => setPage(page - 1)}
+                        role="button"
+                        tabIndex={0}
+                        className="pagination-previous"
                     >
-                        <a
-                            className="pagination-previous"
-                        >
-                            Previous
-                        </a>
-                    </Link>
+                        Previous
+                    </a>
                 )}
-            {current >= total
+            {page >= totalPages
                 ? (
                     <a
                         className="pagination-next"
@@ -56,49 +56,39 @@ export default function Pagination({ current = 1, total = 1 }: { current: number
                     </a>
                 )
                 : (
-                    <Link
-                        href={{
-                            query: {
-                                ...router.query,
-                                page: current + 1,
-                            },
-                        }}
+                    <a
+                        onClick={() => setPage(page + 1)}
+                        onKeyDown={() => setPage(page + 1)}
+                        role="button"
+                        tabIndex={0}
+                        className="pagination-next"
                     >
-                        <a
-                            className="pagination-next"
-                        >
-                            Next
-                        </a>
-                    </Link>
+                        Next
+                    </a>
                 )}
             <ul className="pagination-list">
-                {new Array(total).fill({}).map((_, i) => {
-                    const currentPage = current - 1
+                {new Array(totalPages).fill({}).map((_, i) => {
+                    const currentPage = page - 1
                     return (
                         // eslint-disable-next-line react/no-array-index-key
                         <React.Fragment key={i}>
-                            {currentPage - 1 === i && i > 1 && current - 2 !== total
+                            {currentPage - 1 === i && i > 1 && page - 2 !== totalPages
                                 && <li><span className="pagination-ellipsis">&hellip;</span></li>}
-                            {[0, currentPage - 1, currentPage, currentPage + 1, total - 1].includes(i)
+                            {[0, currentPage - 1, currentPage, currentPage + 1, totalPages - 1].includes(i)
                                 && (
                                     <li>
-                                        <Link
-                                            href={{
-                                                query: {
-                                                    ...router.query,
-                                                    page: i + 1,
-                                                },
-                                            }}
+                                        <a
+                                            onClick={() => setPage(i + 1)}
+                                            onKeyDown={() => setPage(i + 1)}
+                                            role="button"
+                                            tabIndex={0}
+                                            className={classNames('pagination-link', { 'is-current': currentPage === i })}
                                         >
-                                            <a
-                                                className={classNames('pagination-link', { 'is-current': currentPage === i })}
-                                            >
-                                                {i + 1}
-                                            </a>
-                                        </Link>
+                                            {i + 1}
+                                        </a>
                                     </li>
                                 )}
-                            {currentPage + 1 === i && i < total - 1 && current + 2 !== total
+                            {currentPage + 1 === i && i < totalPages - 1 && page + 2 !== totalPages
                                 && <li><span className="pagination-ellipsis">&hellip;</span></li>}
                         </React.Fragment>
                     )

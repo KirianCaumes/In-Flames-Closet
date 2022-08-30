@@ -1,6 +1,10 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
+/**
+ * Middleware
+ * @param req Request
+ */
 // eslint-disable-next-line import/prefer-default-export
 export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone()

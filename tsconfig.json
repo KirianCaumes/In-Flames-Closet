@@ -25,7 +25,8 @@
     "**/*.ts",
     "**/*.tsx",
     "next.config.js",
-    "next-sitemap.js"
+    "next-sitemap.js",
+    ".eslintrc.js"
   ],
   "exclude": [
     "node_modules"

@@ -1,63 +1,36 @@
-import React, {
-    useEffect,
-    useMemo, useRef, useState,
-} from 'react'
+import React from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
 import getDatabase, {
-    ESort, Params, ItemsResult,
+    ESort, ParamsType, ItemsResultType,
 } from 'helpers/database'
 import {
     Card, Columns, Container, Heading, Media, Form, Button, Section, Breadcrumb, Icon,
 } from 'react-bulma-components'
 import styles from 'styles/pages/index.module.scss'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 import { AiFillHome } from 'react-icons/ai'
-import { ParsedUrlQueryInput } from 'querystring'
 import Pagination from 'components/pagination'
 import { GrPowerReset } from 'react-icons/gr'
 import CategoryIcon from 'components/categoryIcon'
+import useIndex, { ARRAY_SEPARATOR, DEFAULT_DETAILS, DEFAULT_FILTERS } from 'hooks/pages/index.hook'
 
-const ARRAY_SEPARATOR = ' - '
+export type IndexNextType = {
+    /** Params */
+    params: ParamsType
+} & ItemsResultType
 
-const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = function Index({
-    items, pagesNumber, currPage, params, total, limit,
+const Index: NextPage<IndexNextType> = function Index({
+    items, totalPages, params, total, limit,
 }) {
-    const router = useRouter()
-
-    const [isLinksOpen, setIsLinksOpen] = useState(true)
-    const [isYearsOpen, setIsYearsOpen] = useState(false)
-    const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
-
-    const [title, setTitle] = useState((router.query.title as string) || '')
-
-    const selectedLinks = useMemo(() => (router.query.links as string)?.split(ARRAY_SEPARATOR).filter(x => x) ?? [], [router.query.links])
-    const selectedYears = useMemo(() => (router.query.years as string)?.split(ARRAY_SEPARATOR).filter(x => x) ?? [], [router.query.years])
-    const selectedCategories = useMemo(() => (router.query.categories as string)?.split(ARRAY_SEPARATOR).filter(x => x) ?? [], [router.query.categories])
-
-    const titleTimeoutRef = useRef<NodeJS.Timeout>(0 as any)
-
-    // Update title in query when title state change, delayed with a debounce function
-    useEffect(() => {
-        clearTimeout(titleTimeoutRef.current)
-        titleTimeoutRef.current = setTimeout(() => {
-            const query: ParsedUrlQueryInput = {
-                ...router.query,
-                page: 1,
-                title,
-            }
-            if (!title)
-                delete query.title
-            router.push({ pathname: '/', query }, undefined, { scroll: false })
-        }, 250)
-    }, [title]) // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Update title when query change, only used for navigation back
-    useEffect(() => {
-        if ((router.query.title as string) !== title)
-            setTitle(router.query.title as string || '')
-    }, [router.query.title]) // eslint-disable-line react-hooks/exhaustive-deps
+    const {
+        isDetailsOpen,
+        setIsDetailsOpen,
+        filters,
+        setFilters,
+        titleTimeoutRef,
+        router,
+    } = useIndex()
 
     return (
         <>
@@ -110,14 +83,11 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                         {' '}
                                     </span>
                                     <Form.Select
-                                        onChange={ev => router.push({
-                                            pathname: '/',
-                                            query: {
-                                                ...router.query,
-                                                page: 1,
-                                                sort: ev.target.selectedOptions[0]?.value,
-                                            },
-                                        }, undefined, { scroll: false })}
+                                        onChange={ev => setFilters(prevFilters => ({
+                                            ...prevFilters,
+                                            page: 1,
+                                            sort: ev.target.selectedOptions[0]?.value as 'new' | 'old',
+                                        }))}
                                         size="small"
                                     >
                                         <option value="new">
@@ -143,22 +113,27 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                 <Form.Control>
                                     <Form.Input
                                         placeholder="Title"
-                                        value={title}
+                                        defaultValue={filters.title}
                                         type="search"
                                         size="small"
-                                        onChange={ev => setTitle(ev.target.value)}
+                                        onChange={ev => {
+                                            clearTimeout(titleTimeoutRef.current)
+                                            titleTimeoutRef.current = setTimeout(() => setFilters(prevFilters => ({
+                                                ...prevFilters,
+                                                page: 1,
+                                                title: ev.target.value,
+                                            })), 250)
+                                        }}
                                     />
                                 </Form.Control>
                             </Form.Field>
                             <details
-                                open={isLinksOpen}
+                                open={isDetailsOpen.links}
                             >
                                 <summary
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        setIsLinksOpen(!isLinksOpen)
-                                        setIsYearsOpen(false)
-                                        setIsCategoriesOpen(false)
+                                        setIsDetailsOpen(prevIsDetailsOpen => ({ ...prevIsDetailsOpen, links: !prevIsDetailsOpen.links }))
                                     }}
                                     className="label"
                                 >
@@ -168,19 +143,14 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                     {params.links.map(link => (
                                         <Form.Control key={link}>
                                             <Form.Checkbox
-                                                checked={selectedLinks.includes(link)}
-                                                onChange={ev => {
-                                                    const query: ParsedUrlQueryInput = {
-                                                        ...router.query,
-                                                        page: 1,
-                                                        links: ev.target.checked
-                                                            ? [...selectedLinks, link].join(ARRAY_SEPARATOR)
-                                                            : selectedLinks.filter(x => x !== link).join(ARRAY_SEPARATOR),
-                                                    }
-                                                    if (!(query.links as string[])?.length)
-                                                        delete query.links
-                                                    router.push({ pathname: '/', query }, undefined, { scroll: false })
-                                                }}
+                                                checked={filters.links.includes(link)}
+                                                onChange={ev => setFilters(prevFilters => ({
+                                                    ...prevFilters,
+                                                    page: 1,
+                                                    links: ev.target.checked
+                                                        ? [...filters.links, link]
+                                                        : filters.links.filter(x => x !== link),
+                                                }))}
                                             >
                                                 {link}
                                             </Form.Checkbox>
@@ -189,14 +159,12 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                 </Form.Field>
                             </details>
                             <details
-                                open={isYearsOpen}
+                                open={isDetailsOpen.years}
                             >
                                 <summary
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        setIsLinksOpen(false)
-                                        setIsYearsOpen(!isYearsOpen)
-                                        setIsCategoriesOpen(false)
+                                        setIsDetailsOpen(prevIsDetailsOpen => ({ ...prevIsDetailsOpen, years: !prevIsDetailsOpen.years }))
                                     }}
                                     className="label"
                                 >
@@ -206,19 +174,14 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                     {params.years.map(year => (
                                         <Form.Control key={year}>
                                             <Form.Checkbox
-                                                checked={selectedYears.includes(year)}
-                                                onChange={ev => {
-                                                    const query: ParsedUrlQueryInput = {
-                                                        ...router.query,
-                                                        page: 1,
-                                                        years: ev.target.checked
-                                                            ? [...selectedYears, year].join(ARRAY_SEPARATOR)
-                                                            : selectedYears.filter(x => x !== year).join(ARRAY_SEPARATOR),
-                                                    }
-                                                    if (!(query.years as string[])?.length)
-                                                        delete query.years
-                                                    router.push({ pathname: '/', query }, undefined, { scroll: false })
-                                                }}
+                                                checked={filters.years.includes(year)}
+                                                onChange={ev => setFilters(prevFilters => ({
+                                                    ...prevFilters,
+                                                    page: 1,
+                                                    years: ev.target.checked
+                                                        ? [...filters.years, year]
+                                                        : filters.years.filter(x => x !== year),
+                                                }))}
                                             >
                                                 {year}
                                             </Form.Checkbox>
@@ -227,14 +190,12 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                 </Form.Field>
                             </details>
                             <details
-                                open={isCategoriesOpen}
+                                open={isDetailsOpen.categories}
                             >
                                 <summary
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        setIsLinksOpen(false)
-                                        setIsYearsOpen(false)
-                                        setIsCategoriesOpen(!isCategoriesOpen)
+                                        setIsDetailsOpen(prevIsDetailsOpen => ({ ...prevIsDetailsOpen, categories: !prevIsDetailsOpen.categories }))
                                     }}
                                     className="label"
                                 >
@@ -244,19 +205,14 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                                     {params.categories.map(category => (
                                         <Form.Control key={category}>
                                             <Form.Checkbox
-                                                checked={selectedCategories.includes(category)}
-                                                onChange={ev => {
-                                                    const query: ParsedUrlQueryInput = {
-                                                        ...router.query,
-                                                        page: 1,
-                                                        categories: ev.target.checked
-                                                            ? [...selectedCategories, category].join(ARRAY_SEPARATOR)
-                                                            : selectedCategories.filter(x => x !== category).join(ARRAY_SEPARATOR),
-                                                    }
-                                                    if (!(query.categories as string[])?.length)
-                                                        delete query.categories
-                                                    router.push({ pathname: '/', query }, undefined, { scroll: false })
-                                                }}
+                                                checked={filters.categories.includes(category)}
+                                                onChange={ev => setFilters(prevFilters => ({
+                                                    ...prevFilters,
+                                                    page: 1,
+                                                    categories: ev.target.checked
+                                                        ? [...filters.categories, category]
+                                                        : filters.categories.filter(x => x !== category),
+                                                }))}
                                             >
                                                 <span>
                                                     {category}
@@ -272,13 +228,8 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                             <Button
                                 className={styles['left-column-button-reset']}
                                 onClick={() => {
-                                    router.push({
-                                        pathname: '/',
-                                        query: {},
-                                    })
-                                    setIsLinksOpen(true)
-                                    setIsYearsOpen(false)
-                                    setIsCategoriesOpen(false)
+                                    setFilters(DEFAULT_FILTERS)
+                                    setIsDetailsOpen(DEFAULT_DETAILS)
                                 }}
                                 size="small"
                                 color="dark"
@@ -353,8 +304,12 @@ const Index: NextPage<ItemsResult & { params: Params; currPage: number; }> = fun
                             </div>
                             <br />
                             <Pagination
-                                current={currPage}
-                                total={pagesNumber}
+                                page={filters.page}
+                                setPage={async newPage => {
+                                    await router.push({ pathname: '/', query: { ...router.query, page: newPage } }, undefined, { scroll: true })
+                                    setFilters(prevFilters => ({ ...prevFilters, page: newPage }))
+                                }}
+                                totalPages={totalPages}
                             />
                         </Columns.Column>
                     </Columns>
@@ -371,12 +326,10 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
     const database = getDatabase()
 
-    const currPage = !Number.isNaN(Number.parseInt(page as string, 10)) ? Number.parseInt(page as string, 10) : 1
-
     const {
-        items, pagesNumber, total, limit,
+        items, totalPages, total, limit,
     } = await database.getAll({
-        page: currPage,
+        page: !Number.isNaN(Number.parseInt(page as string, 10)) ? Number.parseInt(page as string, 10) : 1,
         links: (links as string)?.split(ARRAY_SEPARATOR).filter(x => x),
         years: (years as string)?.split(ARRAY_SEPARATOR).filter(x => x),
         categories: (categories as string)?.split(ARRAY_SEPARATOR).filter(x => x),
@@ -388,7 +341,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
     return {
         props: {
-            items, pagesNumber, currPage, params, total, limit,
+            items, totalPages, params, total, limit,
         },
     }
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
-import getDatabase, { Item } from 'helpers/database'
+import getDatabase, { ItemType } from 'helpers/database'
 import {
     Breadcrumb, Columns, Container, Content, Heading, Icon, Section,
 } from 'react-bulma-components'
@@ -16,7 +16,12 @@ import getConfig from 'next/config'
 
 const { publicRuntimeConfig } = getConfig()
 
-const Index: NextPage<{ item: Item }> = function Index({ item }) {
+export type IdNextType = {
+    /** Item */
+    item: ItemType
+}
+
+const Id: NextPage<IdNextType> = function Id({ item }) {
     const [canShare, setCanShare] = useState(false)
 
     const shareData: ShareData = useMemo(() => ({
@@ -278,4 +283,4 @@ export const getServerSideProps: GetServerSideProps = async context => {
     }
 }
 
-export default Index
+export default Id
