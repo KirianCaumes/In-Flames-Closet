@@ -133,7 +133,11 @@ const Index: NextPage<IndexNextType> = function Index({
                                 <summary
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        setIsDetailsOpen(prevIsDetailsOpen => ({ ...prevIsDetailsOpen, links: !prevIsDetailsOpen.links }))
+                                        setIsDetailsOpen(prevIsDetailsOpen => ({
+                                            links: !prevIsDetailsOpen.links,
+                                            years: false,
+                                            categories: false,
+                                        }))
                                     }}
                                     className="label"
                                 >
@@ -164,7 +168,11 @@ const Index: NextPage<IndexNextType> = function Index({
                                 <summary
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        setIsDetailsOpen(prevIsDetailsOpen => ({ ...prevIsDetailsOpen, years: !prevIsDetailsOpen.years }))
+                                        setIsDetailsOpen(prevIsDetailsOpen => ({
+                                            links: false,
+                                            years: !prevIsDetailsOpen.years,
+                                            categories: false,
+                                        }))
                                     }}
                                     className="label"
                                 >
@@ -195,7 +203,11 @@ const Index: NextPage<IndexNextType> = function Index({
                                 <summary
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        setIsDetailsOpen(prevIsDetailsOpen => ({ ...prevIsDetailsOpen, categories: !prevIsDetailsOpen.categories }))
+                                        setIsDetailsOpen(prevIsDetailsOpen => ({
+                                            links: false,
+                                            years: false,
+                                            categories: !prevIsDetailsOpen.categories,
+                                        }))
                                     }}
                                     className="label"
                                 >
