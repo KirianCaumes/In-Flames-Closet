@@ -1,6 +1,6 @@
 import { getServerSideSitemap, ISitemapField } from 'next-sitemap'
 import { GetServerSideProps } from 'next'
-import getDatabase, { ESort } from 'helpers/database'
+import getDatabase from 'helpers/database'
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
     const database = getDatabase()
@@ -11,7 +11,7 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
         links: [],
         years: [],
         categories: [],
-        sort: ESort.NEW,
+        sort: 'new',
         title: '',
     })
 

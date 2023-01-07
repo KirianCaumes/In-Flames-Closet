@@ -11,7 +11,7 @@ import classNames from 'classnames'
 import { AiFillHome, AiOutlineShareAlt } from 'react-icons/ai'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { Carousel } from 'react-responsive-carousel'
-import CategoryIcon from 'components/categoryIcon'
+import CategoryIcon from 'components/category-icon'
 import getConfig from 'next/config'
 
 const { publicRuntimeConfig } = getConfig()
@@ -30,6 +30,9 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
         text: '',
     }), [item])
 
+    const title = useMemo(() => `${item?.title || 'Unknown'} - In Flames Closet`, [item?.title])
+
+    // We use a useEffect here, to be sure to be in a navigator context
     useEffect(() => {
         setCanShare(navigator.canShare?.(shareData))
     }, [shareData])
@@ -38,9 +41,7 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
         <>
             <Head>
                 <title>
-                    {item?.title || 'Unknown'}
-                    {' '}
-                    - In Flames Closet
+                    {title}
                 </title>
                 <meta
                     name="description"

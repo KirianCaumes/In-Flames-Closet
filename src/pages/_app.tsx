@@ -2,7 +2,7 @@ import React from 'react'
 import type { AppProps } from 'next/app'
 import 'styles/index.scss'
 import Layout from 'components/layout'
-import GdprBanner from 'components/gdprBanner'
+import GdprBanner from 'components/gdpr-banner'
 
 /**
  * My app

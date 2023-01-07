@@ -1,5 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 declare module 'react' {
     // eslint-disable-next-line
@@ -12,14 +14,14 @@ declare module 'react' {
 /**
  * Pagination
  */
-export default function Pagination({ page = 1, totalPages = 1, setPage }: {
+export default function Pagination({ page = 1, pages = 1 }: {
     /** page */
     page: number
-    /** totalPages */
-    totalPages: number
-    /** Set page */
-    setPage: (newPage: number) => void
+    /** pages */
+    pages: number
 }) {
+    const router = useRouter()
+
     return (
         <nav
             className="pagination"
@@ -36,17 +38,23 @@ export default function Pagination({ page = 1, totalPages = 1, setPage }: {
                     </a>
                 )
                 : (
-                    <a
-                        onClick={() => setPage(page - 1)}
-                        onKeyDown={() => setPage(page - 1)}
-                        role="button"
-                        tabIndex={0}
-                        className="pagination-previous"
+                    <Link
+                        href={{
+                            query: {
+                                ...router.query,
+                                page: page - 1,
+                            },
+                        }}
+                        scroll
                     >
-                        Previous
-                    </a>
+                        <a
+                            className="pagination-previous"
+                        >
+                            Previous
+                        </a>
+                    </Link>
                 )}
-            {page >= totalPages
+            {page >= pages
                 ? (
                     <a
                         className="pagination-next"
@@ -56,39 +64,51 @@ export default function Pagination({ page = 1, totalPages = 1, setPage }: {
                     </a>
                 )
                 : (
-                    <a
-                        onClick={() => setPage(page + 1)}
-                        onKeyDown={() => setPage(page + 1)}
-                        role="button"
-                        tabIndex={0}
-                        className="pagination-next"
+                    <Link
+                        href={{
+                            query: {
+                                ...router.query,
+                                page: page + 1,
+                            },
+                        }}
+                        scroll
                     >
-                        Next
-                    </a>
+                        <a
+                            className="pagination-next"
+                        >
+                            Next
+                        </a>
+                    </Link>
                 )}
             <ul className="pagination-list">
-                {new Array(totalPages).fill({}).map((_, i) => {
+                {new Array(pages).fill({}).map((_, i) => {
                     const currentPage = page - 1
                     return (
                         // eslint-disable-next-line react/no-array-index-key
                         <React.Fragment key={i}>
-                            {currentPage - 1 === i && i > 1 && page - 2 !== totalPages
+                            {currentPage - 1 === i && i > 1 && page - 2 !== pages
                                 && <li><span className="pagination-ellipsis">&hellip;</span></li>}
-                            {[0, currentPage - 1, currentPage, currentPage + 1, totalPages - 1].includes(i)
+                            {[0, currentPage - 1, currentPage, currentPage + 1, pages - 1].includes(i)
                                 && (
                                     <li>
-                                        <a
-                                            onClick={() => setPage(i + 1)}
-                                            onKeyDown={() => setPage(i + 1)}
-                                            role="button"
-                                            tabIndex={0}
-                                            className={classNames('pagination-link', { 'is-current': currentPage === i })}
+                                        <Link
+                                            href={{
+                                                query: {
+                                                    ...router.query,
+                                                    page: i + 1,
+                                                },
+                                            }}
+                                            scroll
                                         >
-                                            {i + 1}
-                                        </a>
+                                            <a
+                                                className={classNames('pagination-link', { 'is-current': currentPage === i })}
+                                            >
+                                                {i + 1}
+                                            </a>
+                                        </Link>
                                     </li>
                                 )}
-                            {currentPage + 1 === i && i < totalPages - 1 && page + 2 !== totalPages
+                            {currentPage + 1 === i && i < pages - 1 && page + 2 !== pages
                                 && <li><span className="pagination-ellipsis">&hellip;</span></li>}
                         </React.Fragment>
                     )

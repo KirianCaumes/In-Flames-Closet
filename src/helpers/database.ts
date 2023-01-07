@@ -40,7 +40,7 @@ export type ItemsResultType = {
     /** Total */
     total: number
     /** TotalPages */
-    totalPages: number
+    pages: number
     /** Limit */
     limit: number
 }
@@ -68,12 +68,7 @@ export type FiltersType = {
     /** Page */
     page: number
     /** Sort */
-    sort: ESort
-}
-
-export enum ESort {
-    NEW = 'new',
-    OLD = 'old',
+    sort: 'new' | 'old'
 }
 
 /**
@@ -179,7 +174,7 @@ class Database {
         links = [],
         categories = [],
         years = [],
-        sort = ESort.NEW,
+        sort = 'new',
         title = '',
     }: FiltersType): Promise<ItemsResultType> {
         await this.applyItemSync()
@@ -193,10 +188,10 @@ class Database {
             ))
 
         switch (sort) {
-            case ESort.OLD:
+            case 'old':
                 itemsFiltered.reverse()
                 break
-            case ESort.NEW:
+            case 'new':
             default:
                 break
         }
@@ -204,7 +199,7 @@ class Database {
         return {
             items: itemsFiltered.slice(offset * (page - 1), offset * page),
             total: itemsFiltered.length,
-            totalPages: Math.ceil(itemsFiltered.length / offset),
+            pages: Math.ceil(itemsFiltered.length / offset),
             limit: offset,
         }
     }

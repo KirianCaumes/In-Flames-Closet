@@ -1,9 +1,7 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
-import getDatabase, {
-    ESort, ParamsType, ItemsResultType,
-} from 'helpers/database'
+import getDatabase, { ParamsType } from 'helpers/database'
 import {
     Card, Columns, Container, Heading, Media, Form, Button, Section, Breadcrumb, Icon,
 } from 'react-bulma-components'
@@ -12,25 +10,31 @@ import Head from 'next/head'
 import { AiFillHome } from 'react-icons/ai'
 import Pagination from 'components/pagination'
 import { GrPowerReset } from 'react-icons/gr'
-import CategoryIcon from 'components/categoryIcon'
-import useIndex, { ARRAY_SEPARATOR, DEFAULT_DETAILS, DEFAULT_FILTERS } from 'hooks/pages/index.hook'
+import CategoryIcon from 'components/category-icon'
+import setNativeValue from 'helpers/set-native-value'
+import { useRouter } from 'next/router'
 
 export type IndexNextType = {
     /** Params */
     params: ParamsType
-} & ItemsResultType
+    /** Filters */
+    filters: import('helpers/database').FiltersType
+} & import('helpers/database').ItemsResultType
 
 const Index: NextPage<IndexNextType> = function Index({
-    items, totalPages, params, total, limit,
+    items,
+    pages,
+    params,
+    total,
+    limit,
+    filters,
 }) {
-    const {
-        isDetailsOpen,
-        setIsDetailsOpen,
-        filters,
-        setFilters,
-        titleTimeoutRef,
-        router,
-    } = useIndex()
+    const router = useRouter()
+
+    const [isDetailsOpen, setIsDetailsOpen] = useState({ links: true, years: false, categories: false })
+
+    const titleTimeoutRef = useRef<NodeJS.Timeout>(0 as never)
+    const titleInputRef = useRef<HTMLInputElement>(null)
 
     return (
         <>
@@ -83,12 +87,16 @@ const Index: NextPage<IndexNextType> = function Index({
                                         {' '}
                                     </span>
                                     <Form.Select
-                                        onChange={ev => setFilters(prevFilters => ({
-                                            ...prevFilters,
-                                            page: 1,
-                                            sort: ev.target.selectedOptions[0]?.value as 'new' | 'old',
-                                        }))}
+                                        onChange={({ target }) => router.push({
+                                            pathname: '/',
+                                            query: {
+                                                ...router.query,
+                                                page: 1,
+                                                sort: target.selectedOptions[0]?.value as 'new' | 'old',
+                                            },
+                                        })}
                                         size="small"
+                                        value={filters.sort}
                                     >
                                         <option value="new">
                                             Newly added
@@ -116,14 +124,18 @@ const Index: NextPage<IndexNextType> = function Index({
                                         defaultValue={filters.title}
                                         type="search"
                                         size="small"
-                                        onChange={ev => {
+                                        onChange={({ target }) => {
                                             clearTimeout(titleTimeoutRef.current)
-                                            titleTimeoutRef.current = setTimeout(() => setFilters(prevFilters => ({
-                                                ...prevFilters,
-                                                page: 1,
-                                                title: ev.target.value,
-                                            })), 250)
+                                            titleTimeoutRef.current = setTimeout(() => router.push({
+                                                pathname: '/',
+                                                query: {
+                                                    ...router.query,
+                                                    page: 1,
+                                                    title: target.value,
+                                                },
+                                            }), 250)
                                         }}
+                                        domRef={titleInputRef as never}
                                     />
                                 </Form.Control>
                             </Form.Field>
@@ -148,13 +160,16 @@ const Index: NextPage<IndexNextType> = function Index({
                                         <Form.Control key={link}>
                                             <Form.Checkbox
                                                 checked={filters.links.includes(link)}
-                                                onChange={ev => setFilters(prevFilters => ({
-                                                    ...prevFilters,
-                                                    page: 1,
-                                                    links: ev.target.checked
-                                                        ? [...filters.links, link]
-                                                        : filters.links.filter(x => x !== link),
-                                                }))}
+                                                onChange={({ target }) => router.push({
+                                                    pathname: '/',
+                                                    query: {
+                                                        ...router.query,
+                                                        page: 1,
+                                                        links: target.checked
+                                                            ? [...filters.links, link]
+                                                            : filters.links.filter(x => x !== link),
+                                                    },
+                                                })}
                                             >
                                                 {link}
                                             </Form.Checkbox>
@@ -183,13 +198,16 @@ const Index: NextPage<IndexNextType> = function Index({
                                         <Form.Control key={year}>
                                             <Form.Checkbox
                                                 checked={filters.years.includes(year)}
-                                                onChange={ev => setFilters(prevFilters => ({
-                                                    ...prevFilters,
-                                                    page: 1,
-                                                    years: ev.target.checked
-                                                        ? [...filters.years, year]
-                                                        : filters.years.filter(x => x !== year),
-                                                }))}
+                                                onChange={({ target }) => router.push({
+                                                    pathname: '/',
+                                                    query: {
+                                                        ...router.query,
+                                                        page: 1,
+                                                        years: target.checked
+                                                            ? [...filters.years, year]
+                                                            : filters.years.filter(x => x !== year),
+                                                    },
+                                                })}
                                             >
                                                 {year}
                                             </Form.Checkbox>
@@ -218,13 +236,16 @@ const Index: NextPage<IndexNextType> = function Index({
                                         <Form.Control key={category}>
                                             <Form.Checkbox
                                                 checked={filters.categories.includes(category)}
-                                                onChange={ev => setFilters(prevFilters => ({
-                                                    ...prevFilters,
-                                                    page: 1,
-                                                    categories: ev.target.checked
-                                                        ? [...filters.categories, category]
-                                                        : filters.categories.filter(x => x !== category),
-                                                }))}
+                                                onChange={({ target }) => router.push({
+                                                    pathname: '/',
+                                                    query: {
+                                                        ...router.query,
+                                                        page: 1,
+                                                        categories: target.checked
+                                                            ? [...filters.categories, category]
+                                                            : filters.categories.filter(x => x !== category),
+                                                    },
+                                                })}
                                             >
                                                 <span>
                                                     {category}
@@ -240,8 +261,16 @@ const Index: NextPage<IndexNextType> = function Index({
                             <Button
                                 className={styles['left-column-button-reset']}
                                 onClick={() => {
-                                    setFilters(DEFAULT_FILTERS)
-                                    setIsDetailsOpen(DEFAULT_DETAILS)
+                                    router.push({
+                                        pathname: '/',
+                                        query: {},
+                                    })
+                                    setIsDetailsOpen({
+                                        links: true,
+                                        years: false,
+                                        categories: false,
+                                    })
+                                    setNativeValue(titleInputRef.current as HTMLInputElement, '')
                                 }}
                                 size="small"
                                 color="dark"
@@ -317,11 +346,7 @@ const Index: NextPage<IndexNextType> = function Index({
                             <br />
                             <Pagination
                                 page={filters.page}
-                                setPage={async newPage => {
-                                    await router.push({ pathname: '/', query: { ...router.query, page: newPage } }, undefined, { scroll: true })
-                                    setFilters(prevFilters => ({ ...prevFilters, page: newPage }))
-                                }}
-                                totalPages={totalPages}
+                                pages={pages}
                             />
                         </Columns.Column>
                     </Columns>
@@ -338,22 +363,36 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
     const database = getDatabase()
 
-    const {
-        items, totalPages, total, limit,
-    } = await database.getAll({
+    const filters: import('helpers/database').FiltersType = {
         page: !Number.isNaN(Number.parseInt(page as string, 10)) ? Number.parseInt(page as string, 10) : 1,
-        links: (links as string)?.split(ARRAY_SEPARATOR).filter(x => x),
-        years: (years as string)?.split(ARRAY_SEPARATOR).filter(x => x),
-        categories: (categories as string)?.split(ARRAY_SEPARATOR).filter(x => x),
-        sort: sort as ESort,
-        title: (title as string),
-    })
+        // eslint-disable-next-line no-nested-ternary
+        links: links ? (Array.isArray(links) ? links : [links]) : [],
+        // eslint-disable-next-line no-nested-ternary
+        years: years ? (Array.isArray(years) ? years : [years]) : [],
+        // eslint-disable-next-line no-nested-ternary
+        categories: categories ? (Array.isArray(categories) ? categories : [categories]) : [],
+        sort: sort as import('helpers/database').FiltersType['sort'] || 'new',
+        title: (title as string) || '',
+    }
 
-    const params = await database.getParams()
+    const [
+        {
+            items, pages, total, limit,
+        },
+        params,
+    ] = await Promise.all([
+        database.getAll(filters),
+        database.getParams(),
+    ])
 
     return {
         props: {
-            items, totalPages, params, total, limit,
+            items,
+            pages,
+            params,
+            total,
+            limit,
+            filters,
         },
     }
 }
