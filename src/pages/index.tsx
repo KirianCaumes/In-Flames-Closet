@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
 import getDatabase, { ParamsType } from 'helpers/database'
@@ -9,10 +9,12 @@ import styles from 'styles/pages/index.module.scss'
 import Head from 'next/head'
 import { AiFillHome } from 'react-icons/ai'
 import Pagination from 'components/pagination'
-import { GrPowerReset } from 'react-icons/gr'
+import { GrPowerReset, GrStatusUnknown } from 'react-icons/gr'
 import CategoryIcon from 'components/category-icon'
 import setNativeValue from 'helpers/set-native-value'
 import { useRouter } from 'next/router'
+import albums from 'helpers/albums'
+import Image from 'next/image'
 
 export type IndexNextType = {
     /** Params */
@@ -35,6 +37,12 @@ const Index: NextPage<IndexNextType> = function Index({
 
     const titleTimeoutRef = useRef<NodeJS.Timeout>(0 as never)
     const titleInputRef = useRef<HTMLInputElement>(null)
+
+    // Update field title when query is not the same as current value
+    useEffect(() => {
+        if (router.query.title !== titleInputRef.current?.value)
+            setNativeValue(titleInputRef.current as HTMLInputElement, router.query.title?.toString() ?? '')
+    }, [router.query.title])
 
     return (
         <>
@@ -171,7 +179,24 @@ const Index: NextPage<IndexNextType> = function Index({
                                                     },
                                                 })}
                                             >
-                                                {link}
+                                                <Icon>
+                                                    {albums[link]
+                                                        ? (
+                                                            <Image
+                                                                src={albums[link]}
+                                                                alt={link}
+                                                                decoding="async"
+                                                                loading="lazy"
+                                                                layout="fixed"
+                                                                width={14}
+                                                                height={14}
+                                                            />
+                                                        )
+                                                        : <GrStatusUnknown />}
+                                                </Icon>
+                                                <span>
+                                                    {link}
+                                                </span>
                                             </Form.Checkbox>
                                         </Form.Control>
                                     ))}
@@ -247,12 +272,12 @@ const Index: NextPage<IndexNextType> = function Index({
                                                     },
                                                 })}
                                             >
-                                                <span>
-                                                    {category}
-                                                </span>
                                                 <Icon>
                                                     <CategoryIcon name={category} />
                                                 </Icon>
+                                                <span>
+                                                    {category}
+                                                </span>
                                             </Form.Checkbox>
                                         </Form.Control>
                                     ))}
@@ -327,19 +352,31 @@ const Index: NextPage<IndexNextType> = function Index({
                                                             </a>
                                                         </Link>
                                                     </Heading>
-                                                    <Heading
-                                                        subtitle
-                                                        size={6}
-                                                        renderAs="h3"
-                                                    >
-                                                        <span>
-                                                            <CategoryIcon name={item?.category} />
-                                                        </span>
-                                                        <span>{item?.category || 'Unknown'}</span>
-                                                    </Heading>
                                                 </Media.Item>
                                             </Media>
                                         </Card.Content>
+                                        <Card.Footer>
+                                            <Card.Footer.Item title={item?.category}>
+                                                <CategoryIcon name={item?.category} />
+                                                <span>{item?.category || 'Unknown'}</span>
+                                            </Card.Footer.Item>
+                                            <Card.Footer.Item title={item?.link}>
+                                                {albums[item?.link]
+                                                    ? (
+                                                        <Image
+                                                            src={albums[item?.link]}
+                                                            alt={item?.link}
+                                                            decoding="async"
+                                                            loading="lazy"
+                                                            layout="fixed"
+                                                            width={16}
+                                                            height={16}
+                                                        />
+                                                    )
+                                                    : <GrStatusUnknown />}
+                                                <span>{item?.link || 'Unknown'}</span>
+                                            </Card.Footer.Item>
+                                        </Card.Footer>
                                     </Card>
                                 ))}
                             </div>

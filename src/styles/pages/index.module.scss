@@ -43,6 +43,10 @@
         span[class*='icon'] {
           vertical-align: text-top;
         }
+
+        svg {
+          font-size: 14px;
+        }
       }
 
       .left-column-button-reset {
@@ -79,6 +83,8 @@
         justify-content: space-around;
 
         .card {
+          display: flex;
+          flex-direction: column;
           width: 160px;
 
           @include mixins.until(initial-variables.$tablet) {
@@ -87,6 +93,10 @@
             figure.card-image-container {
               height: 140px;
             }
+          }
+
+          > * {
+            flex: 1;
           }
 
           figure.card-image-container {
@@ -105,23 +115,44 @@
           }
 
           div[class*='card-content'] {
-            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0.75rem;
 
-            h3 {
-              span:first-child {
-                margin-right: 0.25rem;
-                vertical-align: middle;
-              }
-            }
-
-            h2,
-            h3 {
+            h2 {
               -webkit-box-orient: vertical;
               /* stylelint-disable-next-line value-no-vendor-prefix */
               display: -webkit-box;
               -webkit-line-clamp: 2;
               overflow: hidden;
               padding-bottom: 0.14em;
+              text-align: center;
+            }
+          }
+
+          div[class*='card-footer'] {
+            div[class*='card-footer-item'] {
+              display: flex;
+              flex-direction: column;
+              font-size: 0.75rem;
+              padding: 0.5rem;
+
+              span {
+                -webkit-box-orient: vertical;
+                /* stylelint-disable-next-line value-no-vendor-prefix */
+                display: -webkit-box;
+                font-size: 0.75rem;
+                -webkit-line-clamp: 1;
+                overflow: hidden;
+                word-break: break-all;
+              }
+
+              svg,
+              img {
+                font-size: 1rem;
+                width: 1rem;
+              }
             }
           }
         }
