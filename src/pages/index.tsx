@@ -177,7 +177,7 @@ const Index: NextPage<IndexNextType> = function Index({
                                                             ? [...filters.links, link]
                                                             : filters.links.filter(x => x !== link),
                                                     },
-                                                })}
+                                                }, undefined, { scroll: false })}
                                             >
                                                 <Icon>
                                                     {albums[link]
@@ -232,7 +232,7 @@ const Index: NextPage<IndexNextType> = function Index({
                                                             ? [...filters.years, year]
                                                             : filters.years.filter(x => x !== year),
                                                     },
-                                                })}
+                                                }, undefined, { scroll: false })}
                                             >
                                                 {year}
                                             </Form.Checkbox>
@@ -270,7 +270,7 @@ const Index: NextPage<IndexNextType> = function Index({
                                                             ? [...filters.categories, category]
                                                             : filters.categories.filter(x => x !== category),
                                                     },
-                                                })}
+                                                }, undefined, { scroll: false })}
                                             >
                                                 <Icon>
                                                     <CategoryIcon name={category} />
@@ -331,6 +331,15 @@ const Index: NextPage<IndexNextType> = function Index({
                                                             alt={item.title}
                                                             decoding="async"
                                                             loading="lazy"
+                                                            className={styles['card-image-container-background']}
+                                                        />
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img
+                                                            src={`/image/${item.folderId}/${item?.imagesId[0]}`}
+                                                            alt={item.title}
+                                                            decoding="async"
+                                                            loading="lazy"
+                                                            className={styles['card-image-container-main']}
                                                         />
                                                     </figure>
                                                 </div>

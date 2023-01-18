@@ -1,6 +1,6 @@
 # In Flames Closet
 
-A simple NextJs project to handle a database of images, about the history of the band "In Flames" through their artworks.
+A simple NextJs project to handle a database of images, about the history of the band "In Flames" through their artworks. 🔥
 
 Check it out [here](<https://github.com/KirianCaumes/In-Flames-Closet>) 👈
 
