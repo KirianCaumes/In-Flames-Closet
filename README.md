@@ -1,39 +1,44 @@
 # In Flames Closet
 
-A simple NextJs project to handle a database of images, about the history of the band "In Flames" through their artworks. 🔥
+A NextJs project to handle a database of images, about the history of the band "In Flames" through their artworks. 🔥
 
 Check it out [here](<https://github.com/KirianCaumes/In-Flames-Closet>) 👈
 
-## How to run the project?
+![Example](https://user-images.githubusercontent.com/24525092/220752469-a308d1b0-5832-4651-8524-a060d935babc.png)
 
-### Setup .env
+## How to deploy in production
 
-You only need create a `.env` file according to the `.env.example` file.
+Create and setup a `.env` according to the `.env.example` file.
 
-### Setup development environment
-
-Run Visual Studio Code
-
-Install "ms-vscode-remote.remote-containers" extension
-
-Open Visual Code in Container : click green icon on bottom left screen, and choose "Open in Container"
-
-Wait for container to setup, and that's it
-
-#### Run in dev
+Install dependecies with:
 
 ```sh
-cd ./front
-npm i #Only first name
+npm install
 ```
 
-Then, go to debuger (Play Icon with a bug) and choose "Start" (Chrome required).
-
-### Run in prod
-
-After preparing the `.env` file, run this:
+Build and start the app with:
 
 ```sh
 npm run build
 npm start
 ```
+
+## How to contribute/develop
+
+There is a [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) on that project already configured, feel free to use it.
+
+Create and setup a `.env` according to the `.env.example` file.
+
+Install dependecies with:
+
+```sh
+npm install
+```
+
+Start the script with the debugger or the following command:
+
+```sh
+npm run dev
+```
+
+You can open a pull request with your new additions.
