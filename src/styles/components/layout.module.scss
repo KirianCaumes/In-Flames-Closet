@@ -13,6 +13,12 @@ body {
         background-image: url('/images/background.png');
         background-position: center 37%;
         background-repeat: no-repeat;
+
+        > div {
+          @include mixins.until(initial-variables.$tablet) {
+            background: rgba(0, 0, 0, 0.6);
+          }
+        }
       }
     }
 

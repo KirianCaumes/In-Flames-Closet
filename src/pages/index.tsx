@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
 import getDatabase, { ParamsType } from 'helpers/database'
@@ -37,12 +37,6 @@ const Index: NextPage<IndexNextType> = function Index({
 
     const titleTimeoutRef = useRef<NodeJS.Timeout>(0 as never)
     const titleInputRef = useRef<HTMLInputElement>(null)
-
-    // Update field title when query is not the same as current value
-    useEffect(() => {
-        if (router.query.title !== titleInputRef.current?.value)
-            setNativeValue(titleInputRef.current as HTMLInputElement, router.query.title?.toString() ?? '')
-    }, [router.query.title])
 
     return (
         <>

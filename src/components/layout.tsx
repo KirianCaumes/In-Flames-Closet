@@ -21,8 +21,9 @@ export default function Layout({ children }: {
                                 In Flames Closet
                             </Heading>
                             <Heading
-                                size={3}
+                                size={5}
                                 subtitle
+                                renderAs="p"
                             >
                                 The history of In Flames through their artworks: clothes, goodies, and more!
                                 {' '}
