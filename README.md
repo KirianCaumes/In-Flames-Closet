@@ -2,7 +2,7 @@
 
 A NextJs project to handle a database of images, about the history of the band "In Flames" through their artworks. 🔥
 
-Check it out [here](<https://github.com/KirianCaumes/In-Flames-Closet>) 👈
+Check it out [here](<https://in-flames-closet.kiriancaumes.fr/>) 👈
 
 ![Example](https://user-images.githubusercontent.com/24525092/220752469-a308d1b0-5832-4651-8524-a060d935babc.png)
 
