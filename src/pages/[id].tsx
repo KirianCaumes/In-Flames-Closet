@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
-import getDatabase, { ItemType } from 'helpers/database'
+import database, { ItemType } from 'helpers/database'
 import {
     Breadcrumb, Columns, Container, Content, Heading, Icon, Section,
 } from 'react-bulma-components'
@@ -273,7 +273,6 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
 export const getServerSideProps: GetServerSideProps = async context => {
     const { id } = context.query
 
-    const database = getDatabase()
     const item = await database.getById(id as string)
 
     return {

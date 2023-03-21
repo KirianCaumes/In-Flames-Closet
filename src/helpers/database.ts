@@ -228,14 +228,6 @@ class Database {
     }
 }
 
-let databaseInstance: Database
+const database = new Database()
 
-/**
- * Get database
- */
-export default function getDatabase() {
-    if (!databaseInstance)
-        databaseInstance = new Database()
-
-    return databaseInstance
-}
+export default database

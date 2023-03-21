@@ -1,10 +1,8 @@
 import { getServerSideSitemap, ISitemapField } from 'next-sitemap'
 import { GetServerSideProps } from 'next'
-import getDatabase from 'helpers/database'
+import database from 'helpers/database'
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
-    const database = getDatabase()
-
     const { items } = await database.getAll({
         offset: 9999,
         page: 1,

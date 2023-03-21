@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
-import getDatabase, { ParamsType } from 'helpers/database'
+import database, { ParamsType } from 'helpers/database'
 import {
     Card, Columns, Container, Heading, Media, Form, Button, Section, Breadcrumb, Icon,
 } from 'react-bulma-components'
@@ -400,8 +400,6 @@ export const getServerSideProps: GetServerSideProps = async context => {
     const {
         page, links, years, categories, sort, title,
     } = context.query
-
-    const database = getDatabase()
 
     const filters: import('helpers/database').FiltersType = {
         page: !Number.isNaN(Number.parseInt(page as string, 10)) ? Number.parseInt(page as string, 10) : 1,
