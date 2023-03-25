@@ -11,7 +11,7 @@ module.exports = {
         policies: [
             {
                 userAgent: '*',
-                allow: '/',
+                disallow: '/', // Disable SEO
             },
             {
                 userAgent: '*',
