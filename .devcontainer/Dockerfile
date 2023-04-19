@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # This Dockerfile adds a non-root user with sudo access.
 ARG USERNAME=vscode
@@ -18,8 +18,8 @@ USER $USERNAME
 
 RUN sudo apt-get clean
 RUN sudo apt-get update
-RUN sudo apt-get -y install curl && \
-    sudo apt-get -y install git
+RUN sudo apt-get -y install curl
+RUN sudo apt-get -y install git
 RUN sudo apt-get update --fix-missing
 
 # install nodejs 18.x
