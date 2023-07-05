@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React, { ReactNode } from 'react'
 import {
     Container, Content, Footer, Heading, Hero,
@@ -18,7 +19,9 @@ export default function Layout({ children }: {
                     <Hero.Body>
                         <Container>
                             <Heading>
-                                In Flames Closet
+                                <Link href="/">
+                                    In Flames Closet
+                                </Link>
                             </Heading>
                             <Heading
                                 size={5}
