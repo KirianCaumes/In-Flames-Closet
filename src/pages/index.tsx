@@ -377,7 +377,11 @@ const Index: NextPage<IndexNextType> = function Index({
                                                         />
                                                     )
                                                     : <GrStatusUnknown />}
-                                                <span>{item?.link || 'Unknown'}</span>
+                                                <span>
+                                                    {(item?.link.length > 10 && item?.link.split(' ').length > 1
+                                                        ? item?.link.split(' ').map(x => x.charAt(0)).join('').toUpperCase()
+                                                        : item?.link) || 'Unknown'}
+                                                </span>
                                             </Card.Footer.Item>
                                         </Card.Footer>
                                     </Card>
