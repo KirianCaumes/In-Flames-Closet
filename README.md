@@ -10,7 +10,7 @@ Check it out [here](<https://in-flames-closet.kiriancaumes.fr/>) 👈
 
 Create and setup a `.env` according to the `.env.example` file.
 
-Install dependecies with:
+Install dependencies with:
 
 ```sh
 npm install
@@ -29,7 +29,7 @@ There is a [devcontainer](https://code.visualstudio.com/docs/devcontainers/conta
 
 Create and setup a `.env` according to the `.env.example` file.
 
-Install dependecies with:
+Install dependencies with:
 
 ```sh
 npm install
