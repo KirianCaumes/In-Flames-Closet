@@ -1,4 +1,4 @@
-import { IncomingForm, File } from 'formidable'
+import { IncomingForm } from 'formidable'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -16,18 +16,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
             const form = new IncomingForm({ multiples: true })
 
-            const { file, folderId } = await new Promise<{
-                /** File */
-                file: File
-                /** Foldr id */
-                folderId: string
-            }>((resolve, reject) => {
-                form.parse(req, (err, fields, files) => {
-                    if (err)
-                        reject(err)
-                    resolve({ file: files.image as File, folderId: fields.folderId as string })
-                })
-            })
+            const [fields, files] = await form.parse(req)
+
+            const folderId = fields.folderId?.[0]
+            const file = files.image?.[0]
 
             if (!file)
                 return res.status(400).send('No image provided')
