@@ -5,9 +5,7 @@ module.exports = {
     changefreq: 'monthly',
     exclude: ['/server-sitemap.xml'],
     robotsTxtOptions: {
-        additionalSitemaps: [
-            `${process.env.SITE_URL || 'https://in-flames-closet.kiriancaumes.fr'}/server-sitemap.xml`,
-        ],
+        additionalSitemaps: [`${process.env.SITE_URL || 'https://in-flames-closet.kiriancaumes.fr'}/server-sitemap.xml`],
         policies: [
             {
                 userAgent: '*',

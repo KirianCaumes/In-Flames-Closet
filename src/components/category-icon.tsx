@@ -1,8 +1,6 @@
 import React from 'react'
 import { AiOutlineFileImage } from 'react-icons/ai'
-import {
-    FaBoxOpen, FaGraduationCap, FaTshirt, FaVestPatches,
-} from 'react-icons/fa'
+import { FaBoxOpen, FaGraduationCap, FaTshirt, FaVestPatches } from 'react-icons/fa'
 import { GiArmoredPants } from 'react-icons/gi'
 import { IoShirtSharp } from 'react-icons/io5'
 import { MdInsertPhoto } from 'react-icons/md'
@@ -11,7 +9,9 @@ import { BsTriangleFill } from 'react-icons/bs'
 /**
  * CategoryIcon
  */
-export default function CategoryIcon({ name = 'Other' }: {
+export default function CategoryIcon({
+    name = 'Other',
+}: {
     /** Name */
     name: string
 }) {

@@ -1,34 +1,37 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import type { GetServerSideProps, NextPage } from 'next'
-import database, { ItemType } from 'helpers/database'
-import {
-    Breadcrumb, Columns, Container, Content, Heading, Icon, Section,
-} from 'react-bulma-components'
-import styles from 'styles/pages/[id].module.scss'
+import { Breadcrumb, Columns, Container, Content, Heading, Icon, Section } from 'react-bulma-components'
 import Head from 'next/head'
 import Link from 'next/link'
 import classNames from 'classnames'
 import { AiFillHome, AiOutlineShareAlt } from 'react-icons/ai'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { Carousel } from 'react-responsive-carousel'
-import CategoryIcon from 'components/category-icon'
 import getConfig from 'next/config'
+import CategoryIcon from 'components/category-icon'
+import database from 'helpers/database'
+import styles from 'styles/pages/[id].module.scss'
+import type { GetServerSideProps, NextPage } from 'next'
+import type { ItemType } from 'helpers/database'
 
 const { publicRuntimeConfig } = getConfig()
 
-export type IdNextType = {
+export interface IdNextType {
     /** Item */
     item: ItemType
 }
 
+// eslint-disable-next-line react/function-component-definition
 const Id: NextPage<IdNextType> = function Id({ item }) {
     const [canShare, setCanShare] = useState(false)
 
-    const shareData: ShareData = useMemo(() => ({
-        title: item.title,
-        url: `/${item.folderId}`,
-        text: '',
-    }), [item])
+    const shareData: ShareData = useMemo(
+        () => ({
+            title: item.title,
+            url: `/${item.folderId}`,
+            text: '',
+        }),
+        [item],
+    )
 
     const title = useMemo(() => `${item?.title || 'Unknown'} - In Flames Closet`, [item?.title])
 
@@ -40,9 +43,7 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
     return (
         <>
             <Head>
-                <title>
-                    {title}
-                </title>
+                <title>{title}</title>
                 <meta
                     name="description"
                     content={[item?.title, item?.category, item?.year].filter(x => x).join(' - ')}
@@ -105,21 +106,17 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
                     <Breadcrumb>
                         <Breadcrumb.Item>
                             <Link href="/">
-                                <a>
-                                    <Icon>
-                                        <AiFillHome />
-                                    </Icon>
-                                    <span>Home</span>
-                                </a>
+                                <Icon>
+                                    <AiFillHome />
+                                </Icon>
+                                <span>Home</span>
                             </Link>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item active>
-                            <a>
-                                <Icon>
-                                    <CategoryIcon name={item?.category} />
-                                </Icon>
-                                <span>{item?.title || 'Unknown'}</span>
-                            </a>
+                            <Icon>
+                                <CategoryIcon name={item?.category} />
+                            </Icon>
+                            <span>{item?.title || 'Unknown'}</span>
                         </Breadcrumb.Item>
                     </Breadcrumb>
                     <Columns>
@@ -185,17 +182,12 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
                                         },
                                     }}
                                 >
-                                    <a>
-                                        {item?.category || 'None'}
-                                    </a>
+                                    {item?.category || 'None'}
                                 </Link>
                             </Heading>
                             <Content>
                                 <p>
-                                    <span className={classNames('label', styles.label)}>
-                                        Year:
-                                    </span>
-                                    {' '}
+                                    <span className={classNames('label', styles.label)}>Year:</span>{' '}
                                     <Link
                                         href={{
                                             pathname: '/',
@@ -204,16 +196,11 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
                                             },
                                         }}
                                     >
-                                        <a>
-                                            {item?.year || 'None'}
-                                        </a>
+                                        {item?.year || 'None'}
                                     </Link>
                                 </p>
                                 <p>
-                                    <span className={classNames('label', styles.label)}>
-                                        Link:
-                                    </span>
-                                    {' '}
+                                    <span className={classNames('label', styles.label)}>Link:</span>{' '}
                                     <Link
                                         href={{
                                             pathname: '/',
@@ -222,42 +209,26 @@ const Id: NextPage<IdNextType> = function Id({ item }) {
                                             },
                                         }}
                                     >
-                                        <a>
-                                            {item?.link || 'None'}
-                                        </a>
+                                        {item?.link || 'None'}
                                     </Link>
                                 </p>
                                 <p>
-                                    <span className={classNames('label', styles.label)}>
-                                        Official:
-                                    </span>
-                                    {' '}
-                                    <span>
-                                        {item?.official || 'None'}
-                                    </span>
+                                    <span className={classNames('label', styles.label)}>Official:</span>{' '}
+                                    <span>{item?.official || 'None'}</span>
                                 </p>
                                 <p>
-                                    <span className={classNames('label', styles.label)}>
-                                        Source:
-                                    </span>
-                                    {' '}
-                                    <span>
-                                        {item?.source || 'None'}
-                                    </span>
+                                    <span className={classNames('label', styles.label)}>Source:</span> <span>{item?.source || 'None'}</span>
                                 </p>
                                 <p>
-                                    <span className={classNames('label', styles.label)}>
-                                        Comment:
-                                    </span>
-                                    {' '}
-                                    <span>
-                                        {item?.comment || 'None'}
-                                    </span>
+                                    <span className={classNames('label', styles.label)}>Comment:</span>{' '}
+                                    <span>{item?.comment || 'None'}</span>
                                 </p>
                                 <a
                                     className="is-dark is-small is-size-7"
                                     // eslint-disable-next-line max-len
-                                    href={encodeURI(`mailto:${publicRuntimeConfig.adminEmail}?subject=[In Flames Closet] Problem with ${item.title} (${item.folderId})&body=Hello,\rI think there is a problem with the item "${item.title}" (${item.folderId}:\r`)}
+                                    href={encodeURI(
+                                        `mailto:${publicRuntimeConfig.adminEmail}?subject=[In Flames Closet] Problem with ${item.title} (${item.folderId})&body=Hello,\rI think there is a problem with the item "${item.title}" (${item.folderId}:\r`,
+                                    )}
                                 >
                                     Report a problem
                                 </a>

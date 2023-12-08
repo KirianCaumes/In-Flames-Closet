@@ -1,5 +1,5 @@
-import { IncomingForm } from 'formidable'
 import { mkdir, readFile, writeFile } from 'fs/promises'
+import { IncomingForm } from 'formidable'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
@@ -11,8 +11,9 @@ export const config = {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     switch (req.method) {
         case 'POST': {
-            if (req.headers['x-api-key'] !== process.env.API_KEY)
+            if (req.headers['x-api-key'] !== process.env.API_KEY) {
                 return res.status(401).send('Invalid API Key')
+            }
 
             const form = new IncomingForm({ multiples: true })
 
@@ -21,11 +22,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             const folderId = fields.folderId?.[0]
             const file = files.image?.[0]
 
-            if (!file)
+            if (!file) {
                 return res.status(400).send('No image provided')
+            }
 
-            if (!folderId)
+            if (!folderId) {
                 return res.status(400).send('No folderId provided')
+            }
 
             const data = await readFile(file.filepath)
             await mkdir(`upload/${folderId}`, { recursive: true })

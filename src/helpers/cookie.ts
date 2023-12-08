@@ -12,7 +12,7 @@ const Cookie = {
      * @param options options
      */
     set(value: string, key: string, options?: cookie.CookieAttributes) {
-        if (typeof window !== 'undefined' && value)
+        if (typeof window !== 'undefined' && value) {
             cookie.set(key, value, {
                 expires: 1,
                 path: '/',
@@ -20,6 +20,7 @@ const Cookie = {
                 sameSite: 'lax',
                 ...options,
             })
+        }
     },
     /**
      * Remove cookie
@@ -27,11 +28,12 @@ const Cookie = {
      * @param options options
      */
     remove(key: string, options?: cookie.CookieAttributes) {
-        if (typeof window !== 'undefined')
+        if (typeof window !== 'undefined') {
             cookie.remove(key, {
                 expires: 1,
                 ...options,
             })
+        }
     },
     /**
      * Get cookie
@@ -42,9 +44,9 @@ const Cookie = {
         return typeof window !== 'undefined'
             ? cookie.get(key) ?? null
             : req?.headers?.cookie
-                ?.split(';')
-                ?.find(c => c?.trim()?.startsWith(`${key}=`))
-                ?.split('=')?.[1] ?? null
+                  ?.split(';')
+                  ?.find(c => c?.trim()?.startsWith(`${key}=`))
+                  ?.split('=')?.[1] ?? null
     },
 }
 

@@ -1,15 +1,13 @@
 import React from 'react'
-import { NextPage } from 'next'
-import {
-    Breadcrumb,
-    Button, Container, Heading, Icon, Section,
-} from 'react-bulma-components'
+import { Breadcrumb, Button, Container, Heading, Icon, Section } from 'react-bulma-components'
 import Link from 'next/link'
 import { AiFillBackward, AiFillHome } from 'react-icons/ai'
 import { BiErrorCircle } from 'react-icons/bi'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import type { NextPage } from 'next'
 
+// eslint-disable-next-line react/function-component-definition
 const My404: NextPage = function My404() {
     const router = useRouter()
 
@@ -31,22 +29,18 @@ const My404: NextPage = function My404() {
                     <Breadcrumb>
                         <Breadcrumb.Item>
                             <Link href="/">
-                                <a>
-                                    <Icon>
-                                        <AiFillHome />
-                                    </Icon>
-                                    <span>Home</span>
-                                </a>
+                                <Icon>
+                                    <AiFillHome />
+                                </Icon>
+                                <span>Home</span>
                             </Link>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item active>
                             <Link href="/error">
-                                <a>
-                                    <Icon>
-                                        <BiErrorCircle />
-                                    </Icon>
-                                    <span>Error</span>
-                                </a>
+                                <Icon>
+                                    <BiErrorCircle />
+                                </Icon>
+                                <span>Error</span>
                             </Link>
                         </Breadcrumb.Item>
                     </Breadcrumb>
@@ -65,9 +59,7 @@ const My404: NextPage = function My404() {
                     >
                         The ressource was not found on the server.
                     </Heading>
-                    <div
-                        className="has-text-centered"
-                    >
+                    <div className="has-text-centered">
                         <Button
                             onClick={() => router.back()}
                             color="dark"
@@ -76,15 +68,15 @@ const My404: NextPage = function My404() {
                                 <AiFillBackward />
                             </Icon>
                             <span>Back</span>
-                        </Button>
-                        {' '}
-                        <Link href="/">
-                            <a className="button is-dark">
-                                <Icon>
-                                    <AiFillHome />
-                                </Icon>
-                                <span>Home</span>
-                            </a>
+                        </Button>{' '}
+                        <Link
+                            href="/"
+                            className="button is-dark"
+                        >
+                            <Icon>
+                                <AiFillHome />
+                            </Icon>
+                            <span>Home</span>
                         </Link>
                     </div>
                 </Container>

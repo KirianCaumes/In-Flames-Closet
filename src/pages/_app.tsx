@@ -1,7 +1,7 @@
 import React from 'react'
+import Layout from 'components/layout'
 import type { AppProps } from 'next/app'
 import 'styles/index.scss'
-import Layout from 'components/layout'
 
 /**
  * My app

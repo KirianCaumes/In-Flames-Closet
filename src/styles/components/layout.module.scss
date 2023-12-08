@@ -1,5 +1,5 @@
-@use '/node_modules/bulma/sass/utilities/mixins.sass';
-@use '/node_modules/bulma/sass/utilities/initial-variables.sass';
+@use 'node_modules/bulma/sass/utilities/mixins.sass';
+@use 'node_modules/bulma/sass/utilities/initial-variables.sass';
 
 body {
   .layout {
@@ -10,7 +10,6 @@ body {
 
     header.layout-hero {
       > section {
-        background-image: url('/images/background.png');
         background-position: center 37%;
         background-repeat: no-repeat;
 

@@ -3,14 +3,19 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "in-flames-closet_container",
   "workspaceFolder": "/app_in-flames-closet",
-  "extensions": [
-    "gruntfuggly.todo-tree",
-    "sibiraj-s.vscode-scss-formatter",
-    "firefox-devtools.vscode-firefox-debug",
-    "msjsdiag.debugger-for-chrome",
-    "davidanson.vscode-markdownlint",
-    "dbaeumer.vscode-eslint",
-    "stylelint.vscode-stylelint",
-    "pflannery.vscode-versionlens"
-  ]
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "gruntfuggly.todo-tree",
+        "sibiraj-s.vscode-scss-formatter",
+        "firefox-devtools.vscode-firefox-debug",
+        "msjsdiag.debugger-for-chrome",
+        "davidanson.vscode-markdownlint",
+        "dbaeumer.vscode-eslint",
+        "stylelint.vscode-stylelint",
+        "pflannery.vscode-versionlens",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
 }

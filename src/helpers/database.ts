@@ -1,23 +1,24 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
+import type { AxiosError } from 'axios'
 
 const RANGE_DATA = 'Data!A1:I999'
 const RANGE_PARAMS = 'Params!A1:D999'
 const DEFAULT_OFFSET = 30
 
-type GoogleApiResponseType = {
+interface GoogleApiResponseType {
     /** Range */
     range: string
     /** MajorDimension */
     majorDimension: string
     /** Values */
-    values: string[][]
+    values: Array<Array<string>>
 }
 
-export type ItemType = {
+export interface ItemType {
     /** FolderId */
     folderId: string
     /** ImagesId */
-    imagesId: string[]
+    imagesId: Array<string>
     /** Title */
     title: string
     /** Category */
@@ -34,9 +35,9 @@ export type ItemType = {
     comment: string
 }
 
-export type ItemsResultType = {
+export interface ItemsResultType {
     /** Items */
-    items: ItemType[]
+    items: Array<ItemType>
     /** Total */
     total: number
     /** TotalPages */
@@ -45,24 +46,24 @@ export type ItemsResultType = {
     limit: number
 }
 
-export type ParamsType = {
+export interface ParamsType {
     /** Links */
-    links: string[]
+    links: Array<string>
     /** Years */
-    years: string[]
+    years: Array<string>
     /** Categories */
-    categories: string[]
+    categories: Array<string>
 }
 
-export type FiltersType = {
+export interface FiltersType {
     /** Offset */
     offset?: number
     /** Links */
-    links: string[]
+    links: Array<string>
     /** Years */
-    years: string[]
+    years: Array<string>
     /** Categories */
-    categories: string[]
+    categories: Array<string>
     /** Title */
     title: string
     /** Page */
@@ -75,13 +76,13 @@ export type FiltersType = {
  * Database
  */
 class Database {
-    private items: ItemType[] = []
+    private items: Array<ItemType> = []
 
-    private links: string[] = []
+    private links: Array<string> = []
 
-    private years: string[] = []
+    private years: Array<string> = []
 
-    private categories: string[] = []
+    private categories: Array<string> = []
 
     /**
      * Synchronize item with local
@@ -129,12 +130,11 @@ class Database {
                 },
             })
 
-            const params = result.data?.values
-                ?.map(value => ({
-                    category: value[0] || '',
-                    link: value[1] || '',
-                    year: value[2] || '',
-                }))
+            const params = result.data?.values?.map(value => ({
+                category: value[0] || '',
+                link: value[1] || '',
+                year: value[2] || '',
+            }))
 
             this.links = params.map(x => x.link).filter((value, index, self) => value && self.indexOf(value) === index)
             this.years = params.map(x => x.year).filter((value, index, self) => value && self.indexOf(value) === index)
@@ -149,20 +149,22 @@ class Database {
      * Apply a item synchronization
      */
     private async applyItemSync() {
-        if (!this.items?.length)
+        if (!this.items?.length) {
             await this.syncItem()
-        else
+        } else {
             this.syncItem()
+        }
     }
 
     /**
      * Apply a param synchronization
      */
     private async applyParamSync() {
-        if (!this.links?.length || !this.years?.length || !this.categories?.length)
+        if (!this.links?.length || !this.years?.length || !this.categories?.length) {
             await this.syncParams()
-        else
+        } else {
             this.syncParams()
+        }
     }
 
     /**
@@ -179,13 +181,13 @@ class Database {
     }: FiltersType): Promise<ItemsResultType> {
         await this.applyItemSync()
 
-        const itemsFiltered = this.items
-            .filter(item => (
-                (links?.length === 0 || links.includes(item.link))
-                && (categories?.length === 0 || categories.includes(item.category))
-                && (years?.length === 0 || years.includes(item.year))
-                && (!title || item.title?.toLowerCase().includes(title.toLocaleLowerCase()))
-            ))
+        const itemsFiltered = this.items.filter(
+            item =>
+                (links?.length === 0 || links.includes(item.link)) &&
+                (categories?.length === 0 || categories.includes(item.category)) &&
+                (years?.length === 0 || years.includes(item.year)) &&
+                (!title || item.title?.toLowerCase().includes(title.toLocaleLowerCase())),
+        )
 
         switch (sort) {
             case 'old':

@@ -1,21 +1,27 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Start",
-            "request": "launch",
-            "type": "pwa-chrome",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}",
-            "pathMapping": {
-                "url": "http://localhost:3000/app_in-flames-closet",
-                "path": "${workspaceFolder}"
-            },
-            "preLaunchTask": "front",
-            "runtimeArgs": [
-                "--start-maximized",
-                "--auto-open-devtools-for-tabs"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "runtimeArgs": ["--start-maximized", "--auto-open-devtools-for-tabs"],
+      "presentation": {
+        "hidden": true // <-
+      }
+    },
+    {
+      "name": "⚛️ NextJs",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)", // <-
+        "action": "startDebugging",
+        "name": "Chrome",
+        "killOnServerStop": true
+      }
+    }
+  ]
 }

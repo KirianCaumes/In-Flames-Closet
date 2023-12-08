@@ -9,8 +9,9 @@ export default function setNativeValue(element: HTMLElement | undefined, value: 
     const prototype = Object.getPrototypeOf(element)
     const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set
 
-    if (valueSetter && valueSetter !== prototypeValueSetter)
+    if (valueSetter && valueSetter !== prototypeValueSetter) {
         prototypeValueSetter?.call(element, value)
-    else
+    } else {
         valueSetter?.call(element, value)
+    }
 }
