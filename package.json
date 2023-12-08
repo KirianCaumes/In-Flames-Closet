@@ -13,7 +13,7 @@
     "stylelint": "stylelint \"src/**/*.{css,scss,sass}\"",
     "prettier:fix": "npx prettier --write .",
     "prettier": "npx prettier --check .",
-    "typed-scss-modules": "npx typed-scss-modules src --nameFormat none --exportType default --banner \"/* eslint-disable jsdoc/require-jsdoc, @typescript-eslint/consistent-type-definitions */\" --logLevel info --exportTypeName ClassNames --exportTypeInterface Styles --ignore \"**/themes/default.scss\"",
+    "typed-scss-modules": "npx typed-scss-modules src --nameFormat none --exportType default --banner \"/* eslint-disable jsdoc/require-jsdoc, @typescript-eslint/consistent-type-definitions */\" --logLevel info --exportTypeName ClassNames --exportTypeInterface Styles --ignore \"{**/themes/default.scss,**/styles/index.scss}\"",
     "knip": "NODE_OPTIONS=\"--max-old-space-size=8192\" npx knip"
   },
   "dependencies": {
