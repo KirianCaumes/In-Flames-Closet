@@ -1,7 +1,27 @@
 {
   "name": "in-flames-closet",
+  "description": "A NextJs project to handle a database of images, about the history of the band \"In Flames\" through their artworks. 🔥",
   "version": "0.1.0",
   "private": true,
+  "author": "KirianCaumes",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KirianCaumes/In-Flames-Closet.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KirianCaumes/In-Flames-Closet/issues"
+  },
+  "homepage": "https://github.com/KirianCaumes/In-Flames-Closet#readme",
+  "engines": {
+    "node": "20.x.x"
+  },
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://www.paypal.me/KirianCaumes"
+    }
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -64,8 +84,5 @@
     "stylelint-order": "^6.0.3",
     "typed-scss-modules": "^8.0.0",
     "typescript": "5.3.3"
-  },
-  "engines": {
-    "node": "20.x.x"
   }
 }

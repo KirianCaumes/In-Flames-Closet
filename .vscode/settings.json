@@ -31,7 +31,7 @@
     "editor.defaultFormatter": "vscode.markdown-language-features"
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll": true
+    "source.fixAll": "explicit"
   },
   "eslint.workingDirectories": ["."],
   "eslint.alwaysShowStatus": true,
