@@ -9,6 +9,7 @@ const nextConfig = {
         googleAnalyticsId: 'G-3Y038V6XRB',
         adminEmail: 'kirian.caumes@gmail.com',
     },
+    poweredByHeader: false,
 }
 
 module.exports = nextConfig
