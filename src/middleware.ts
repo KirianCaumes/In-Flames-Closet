@@ -21,3 +21,7 @@ export function middleware(req: NextRequest) {
 
     return null
 }
+
+export const config = {
+    matcher: '/image/:path*',
+}
