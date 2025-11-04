@@ -1,0 +1,4 @@
+/data
+/upload
+*/**/node_modules
+*/**/.next
