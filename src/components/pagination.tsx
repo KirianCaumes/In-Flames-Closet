@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import classNames from 'classnames'
 import Link from 'next/link'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import type { Filters } from 'lib/database'
 
 interface PaginationProps {
@@ -36,7 +36,6 @@ function buildPageUrl(pathname: string, params: URLSearchParams, page: number): 
  * @returns The pagination navigation element, or null if there's only one page
  */
 export default function Pagination({ filters, pages }: PaginationProps) {
-    const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
@@ -87,9 +86,6 @@ export default function Pagination({ filters, pages }: PaginationProps) {
                     aria-label="Previous page"
                     className={arrowCls(true)}
                     href={buildPageUrl(pathname, searchParams, page - 1)}
-                    onMouseEnter={() => {
-                        router.prefetch(buildPageUrl(pathname, searchParams, page - 1))
-                    }}
                 >
                     <svg
                         className="w-4 h-4"
@@ -148,9 +144,6 @@ export default function Pagination({ filters, pages }: PaginationProps) {
                         )}
                         href={buildPageUrl(pathname, searchParams, p)}
                         key={p}
-                        onMouseEnter={() => {
-                            router.prefetch(buildPageUrl(pathname, searchParams, p))
-                        }}
                     >
                         {p}
                     </Link>
@@ -162,9 +155,6 @@ export default function Pagination({ filters, pages }: PaginationProps) {
                     aria-label="Next page"
                     className={arrowCls(true)}
                     href={buildPageUrl(pathname, searchParams, page + 1)}
-                    onMouseEnter={() => {
-                        router.prefetch(buildPageUrl(pathname, searchParams, page + 1))
-                    }}
                 >
                     <svg
                         className="w-4 h-4"

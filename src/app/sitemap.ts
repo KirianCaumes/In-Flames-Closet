@@ -9,15 +9,7 @@ import type { MetadataRoute } from 'next'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = process.env.SITE_URL ?? ''
 
-    const { items } = await database.getAll({
-        offset: 9999,
-        page: 1,
-        links: [],
-        years: [],
-        categories: [],
-        sort: 'new',
-        title: '',
-    })
+    const items = await database.getItems()
 
     return [
         {

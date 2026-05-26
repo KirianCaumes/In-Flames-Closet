@@ -1,6 +1,5 @@
-const RANGE_DATA = 'Data!A1:I999'
-const RANGE_PARAMS = 'Params!A1:D999'
-const DEFAULT_OFFSET = 60
+const RANGE_DATA = 'Data!A1:I9999'
+const RANGE_PARAMS = 'Params!A1:D9999'
 
 interface GoogleApiResponse {
     /** Range */
@@ -130,31 +129,11 @@ class Database {
     }
 
     /**
-     * Get all items matching the given filters, paginated
-     * @returns A paginated result of items matching the filters, along with total count and available pages
+     * Get all items without filtering or pagination
+     * @returns Full list of items in default order (newest first)
      */
-    public async getAll({ offset = DEFAULT_OFFSET, page, links, categories, years, sort, title }: Filters): Promise<ItemsResult> {
-        const items = await this.fetchItems()
-
-        const itemsFiltered = items.filter(
-            item =>
-                (links.length === 0 || links.includes(item.link)) &&
-                (categories.length === 0 || categories.includes(item.category)) &&
-                (years.length === 0 || years.includes(item.year)) &&
-                (!title || item.title.toLowerCase().includes(title.toLocaleLowerCase())),
-        )
-
-        if (sort === 'old') {
-            itemsFiltered.reverse()
-        }
-
-        return {
-            items: itemsFiltered.slice(offset * (page - 1), offset * page),
-            total: itemsFiltered.length,
-            totalAll: items.length,
-            pages: Math.ceil(itemsFiltered.length / offset),
-            limit: offset,
-        }
+    public async getItems(): Promise<Array<Item>> {
+        return this.fetchItems()
     }
 
     /**

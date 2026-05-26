@@ -16,6 +16,8 @@ interface ItemFiltersProps extends Pick<ItemsResult, 'limit'> {
     readonly total: number
     /** Whether the filter panel is open by default (server-detected from User-Agent) */
     readonly defaultOpen: boolean
+    /** Callback to update filters and sync to URL */
+    readonly onFiltersChange: (next: Filters) => void
 }
 
 /**
@@ -23,7 +25,7 @@ interface ItemFiltersProps extends Pick<ItemsResult, 'limit'> {
  * Syncs state to URL query parameters via router.push.
  * @returns The rendered filter sidebar with sections for title search, linked albums, years and categories, and a sort dropdown.
  */
-export default function ItemFilters({ filters, params, total, limit, defaultOpen }: ItemFiltersProps) {
+export default function ItemFilters({ filters, params, total, limit, defaultOpen, onFiltersChange }: ItemFiltersProps) {
     const router = useRouter()
     const titleInputRef = useRef<HTMLInputElement>(null)
 
@@ -61,19 +63,12 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
         [filters],
     )
 
-    const push = useCallback(
-        (partial: Record<string, string | Array<string> | number>) => {
-            router.push(buildUrl(partial), { scroll: true })
-        },
-        [buildUrl, router],
-    )
-
     const reset = useCallback(() => {
         if (titleInputRef.current) {
             titleInputRef.current.value = ''
         }
-        router.push('/', { scroll: true })
-    }, [router])
+        onFiltersChange({ page: 1, links: [], years: [], categories: [], sort: 'new', title: '' })
+    }, [onFiltersChange])
 
     const isFiltered = Object.entries(filters).some(([key, value]) => {
         if (key === 'sort') {
@@ -143,7 +138,7 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                             // eslint-disable-next-line max-len
                             className="text-xs bg-stone-800 border border-stone-700 text-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-brand-500 cursor-pointer"
                             onChange={({ target }) => {
-                                push({ sort: target.value, page: 1 })
+                                onFiltersChange({ ...filters, sort: target.value as Filters['sort'], page: 1 })
                             }}
                             value={filters.sort}
                         >
@@ -166,7 +161,7 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                             defaultValue={filters.title}
                             id="filter-title"
                             onChange={({ target }) => {
-                                push({ title: target.value, page: 1 })
+                                onFiltersChange({ ...filters, title: target.value, page: 1 })
                             }}
                             placeholder="Search title..."
                             ref={titleInputRef}
@@ -225,7 +220,8 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                                 checked={filters.links.includes(link)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer min-w-4"
                                                 onChange={({ target }) => {
-                                                    push({
+                                                    onFiltersChange({
+                                                        ...filters,
                                                         links: target.checked
                                                             ? [...filters.links, link]
                                                             : filters.links.filter(x => x !== link),
@@ -324,7 +320,8 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                                 checked={filters.categories.includes(category)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer"
                                                 onChange={({ target }) => {
-                                                    push({
+                                                    onFiltersChange({
+                                                        ...filters,
                                                         categories: target.checked
                                                             ? [...filters.categories, category]
                                                             : filters.categories.filter(x => x !== category),

@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useDeferredValue, useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
 import ItemCard from 'components/item-card'
@@ -9,26 +10,115 @@ import ItemFilters from 'components/item-filters'
 import Pagination from 'components/pagination'
 // eslint-disable-next-line no-restricted-imports
 import IconSvg from '../../public/favicon.svg'
-import type { Filters, ItemsResult, Params } from 'lib/database'
+import type { Filters, Item, Params } from 'lib/database'
 
-interface ClosetPageProps extends Pick<ItemsResult, 'items' | 'total' | 'pages' | 'limit'> {
-    /** Active filters */
-    readonly filters: Filters
+const DEFAULT_LIMIT = 60
+
+const DEFAULT_FILTERS: Filters = { page: 1, links: [], years: [], categories: [], sort: 'new', title: '' }
+
+/**
+ * Parses URL search parameters into a Filters object.
+ * @param params The URLSearchParams from the current URL
+ * @returns Filters object representing the current filter state
+ */
+function filtersFromParams(params: URLSearchParams): Filters {
+    const page = Number.parseInt(params.get('page') ?? '', 10)
+    return {
+        page: Number.isNaN(page) ? 1 : page,
+        links: params.getAll('links'),
+        years: params.getAll('years'),
+        categories: params.getAll('categories'),
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        sort: (params.get('sort') as Filters['sort']) ?? 'new',
+        title: params.get('title') ?? '',
+    }
+}
+
+/**
+ * Converts a Filters object into a URL query string.
+ * @param filters The current filter state
+ * @returns A query string representing the filters (without leading `?`)
+ */
+function paramsFromFilters(filters: Filters): string {
+    const params = new URLSearchParams()
+    if (filters.page !== 1) {
+        params.set('page', filters.page.toString())
+    }
+    if (filters.title) {
+        params.set('title', filters.title)
+    }
+    if (filters.sort !== 'new') {
+        params.set('sort', filters.sort)
+    }
+    filters.links.forEach(l => {
+        params.append('links', l)
+    })
+    filters.years.forEach(y => {
+        params.append('years', y)
+    })
+    filters.categories.forEach(c => {
+        params.append('categories', c)
+    })
+    return params.toString()
+}
+
+interface ClosetPageProps {
+    /** All items (unfiltered) */
+    readonly items: Array<Item>
     /** All available filter options */
     readonly params: Params
     /** Detected device type for responsive rendering */
     readonly device: 'mobile' | 'desktop'
-    /** Total number of all items */
-    readonly totalAll: number
 }
 
 /**
  * Main archive page - sticky header, filters sidebar, items grid and pagination.
- * Receives SSR-fetched data and handles client-side navigation (URL-driven).
+ * Reads URL search params, applies filters and pagination client-side.
  * @returns The rendered closet page with header, filters, items grid, pagination and footer
  */
-export default function ClosetPage({ items, total, pages, limit, filters, params, device, totalAll }: ClosetPageProps) {
+export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+
+    const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
+    const deferredFilters = useDeferredValue(filters)
+    const isStale = filters !== deferredFilters
+
+    const { pagedItems, total, pages } = useMemo(() => {
+        const { links, categories, years, sort, title, page } = deferredFilters
+
+        let filtered = items.filter(
+            item =>
+                (links.length === 0 || links.includes(item.link)) &&
+                (categories.length === 0 || categories.includes(item.category)) &&
+                (years.length === 0 || years.includes(item.year)) &&
+                (!title || item.title.toLowerCase().includes(title.toLowerCase())),
+        )
+
+        if (sort === 'old') {
+            filtered = [...filtered].reverse()
+        }
+
+        const filteredTotal = filtered.length
+        const filteredPages = Math.ceil(filteredTotal / DEFAULT_LIMIT)
+
+        return {
+            pagedItems: filtered.slice(DEFAULT_LIMIT * (page - 1), DEFAULT_LIMIT * page),
+            total: filteredTotal,
+            pages: filteredPages,
+        }
+    }, [items, deferredFilters])
+
+    /**
+     * Updates filters state and syncs the new filter values to the URL.
+     * @param next - New filter values to apply
+     */
+    function handleFiltersChange(next: Filters) {
+        setFilters(next)
+        const qs = paramsFromFilters(next)
+        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    }
 
     return (
         <>
@@ -53,7 +143,7 @@ export default function ClosetPage({ items, total, pages, limit, filters, params
                         </div>
                     </div>
                     <div className="text-right shrink-0">
-                        <div className="text-2xl font-bold text-brand-500">{totalAll}</div>
+                        <div className="text-2xl font-bold text-brand-500">{items.length}</div>
                         <div className="text-xs text-stone-400">items archived</div>
                     </div>
                 </div>
@@ -68,7 +158,8 @@ export default function ClosetPage({ items, total, pages, limit, filters, params
                             <ItemFilters
                                 defaultOpen={device === 'desktop'}
                                 filters={filters}
-                                limit={limit}
+                                limit={DEFAULT_LIMIT}
+                                onFiltersChange={handleFiltersChange}
                                 params={params}
                                 total={total}
                             />
@@ -77,7 +168,7 @@ export default function ClosetPage({ items, total, pages, limit, filters, params
 
                     {/* Items grid */}
                     <div className="flex-1 min-w-0">
-                        {items.length === 0 ? (
+                        {pagedItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
                                 <svg
                                     className="w-12 h-12 text-stone-700"
@@ -96,7 +187,7 @@ export default function ClosetPage({ items, total, pages, limit, filters, params
                                 <button
                                     className="text-sm text-brand-500 hover:text-brand-400 underline underline-offset-2 transition-colors cursor-pointer"
                                     onClick={() => {
-                                        router.push('/')
+                                        handleFiltersChange(DEFAULT_FILTERS)
                                     }}
                                     type="button"
                                 >
@@ -105,8 +196,11 @@ export default function ClosetPage({ items, total, pages, limit, filters, params
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    {items.map(item => (
+                                <div
+                                    // eslint-disable-next-line max-len
+                                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150 ${isStale ? 'opacity-50' : 'opacity-100'}`}
+                                >
+                                    {pagedItems.map(item => (
                                         <ItemCard
                                             item={item}
                                             key={item.folderId}

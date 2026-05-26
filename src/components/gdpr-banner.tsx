@@ -101,9 +101,9 @@ export default function GdprBanner() {
             )}
 
             {isVisible && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 border-t border-gray-700 shadow-2xl">
+                <div className="fixed bottom-0 left-0 right-0 z-50 bg-stone-900/80 backdrop-blur-sm border-t border-stone-800 shadow-2xl">
                     <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center gap-4">
-                        <p className="text-sm text-gray-300 flex-1 text-center sm:text-left">
+                        <p className="text-sm text-stone-400 flex-1 text-center sm:text-left">
                             This site uses cookies to analyze your preferences anonymously via Google Analytics. You can accept this to
                             allow us to improve your experience, or refuse it.
                         </p>
@@ -120,7 +120,7 @@ export default function GdprBanner() {
                             </button>
                             <button
                                 // eslint-disable-next-line max-len
-                                className="flex items-center gap-2 px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium transition-colors cursor-pointer"
+                                className="flex items-center gap-2 px-4 py-2 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-sm font-medium transition-colors cursor-pointer"
                                 onClick={onRefuse}
                                 type="button"
                             >
