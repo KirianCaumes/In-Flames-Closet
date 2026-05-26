@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+
+@theme {
+    --color-brand-300: #fcd34d;
+    --color-brand-400: #fbbf24;
+    --color-brand-500: #f59e0b;
+    --color-brand-600: #d97706;
+}
+
+@layer base {
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1c1917;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #44403c;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #57534e;
+    }
+}

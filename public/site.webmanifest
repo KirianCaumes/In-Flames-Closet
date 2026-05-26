@@ -1,5 +1,5 @@
 {
-    "name": "In Flames Closet - The history of In Flames through their artworks: clothes, goodies, and more!",
+    "name": "In Flames Closet - Archive of the band's artworks",
     "short_name": "In Flames Closet",
     "display": "fullscreen",
     "orientation": "portrait",
@@ -16,6 +16,6 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#363636",
-    "background_color": "#363636"
+    "theme_color": "#F59E0B",
+    "background_color": "#F59E0B"
 }

@@ -1,0 +1,5 @@
+# https://github.com/browserslist/browserslist#queries Documentation
+# https://browsersl.ist Help tool
+>0.3%
+not dead
+not op_mini all
