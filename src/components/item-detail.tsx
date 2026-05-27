@@ -2,6 +2,7 @@
 
 import classNames from 'classnames'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import CategoryIcon from 'components/category-icon'
@@ -19,6 +20,7 @@ interface ItemDetailProps {
  * @returns The rendered item detail page, with image carousel, metadata and share functionality
  */
 export default function ItemDetail({ item }: ItemDetailProps) {
+    const router = useRouter()
     const [activeIndex, setActiveIndex] = useState(0)
     const albumCover = albums[item.link]
 
@@ -27,11 +29,14 @@ export default function ItemDetail({ item }: ItemDetailProps) {
             {/* ── Header ─────────────────────────────────────────────── */}
             <header className="bg-stone-900/80 backdrop-blur-sm border-b border-stone-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-                    <Link
+                    <button
                         aria-label="Back to archive"
                         // eslint-disable-next-line max-len
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white transition-colors"
-                        href="/"
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white transition-colors cursor-pointer"
+                        onClick={() => {
+                            router.back()
+                        }}
+                        type="button"
                     >
                         <svg
                             className="w-4 h-4"
@@ -46,7 +51,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                 strokeWidth={2}
                             />
                         </svg>
-                    </Link>
+                    </button>
                     <nav
                         aria-label="Breadcrumb"
                         className="flex items-center gap-2 text-sm text-stone-400 min-w-0"
@@ -206,36 +211,39 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                             <h1 className="text-2xl sm:text-3xl font-bold text-stone-100 leading-tight flex-1">
                                 {item.title || 'Unknown'}
                             </h1>
-                            <button
-                                aria-label="Share"
-                                // eslint-disable-next-line max-len
-                                className="shrink-0 w-9 h-9 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
-                                onClick={async () => {
-                                    try {
-                                        await navigator.share({
-                                            title: item.title,
-                                            url: `/${item.folderId}`,
-                                        })
-                                    } catch {
-                                        // Dismissed or unsupported - do nothing
-                                    }
-                                }}
-                                type="button"
-                            >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
+                            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                            {navigator.share && (
+                                <button
+                                    aria-label="Share"
+                                    // eslint-disable-next-line max-len
+                                    className="shrink-0 w-9 h-9 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+                                    onClick={async () => {
+                                        try {
+                                            await navigator.share({
+                                                title: item.title,
+                                                url: `/${item.folderId}`,
+                                            })
+                                        } catch {
+                                            // Dismissed or unsupported - do nothing
+                                        }
+                                    }}
+                                    type="button"
                                 >
-                                    <path
-                                        d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                    />
-                                </svg>
-                            </button>
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                        />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
 
                         {/* Metadata rows */}

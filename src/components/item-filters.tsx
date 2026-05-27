@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import classNames from 'classnames'
 import CategoryIcon from 'components/category-icon'
 import albums from 'lib/albums'
 import type { Filters, ItemsResult, Params } from 'lib/database'
@@ -124,9 +125,10 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
 
             {/* Filter body */}
             <div
-                className={`overflow-hidden transition-[max-height] duration-300 ease-in-out lg:!max-h-none ${
-                    isFiltersOpen ? 'max-h-[2000px]' : 'max-h-0'
-                }`}
+                className={classNames(
+                    'overflow-hidden transition-[max-height] duration-300 ease-in-out lg:!max-h-none',
+                    isFiltersOpen ? 'max-h-[1200px]' : 'max-h-0',
+                )}
             >
                 <div className="space-y-4  mt-2">
                     {/* Results summary + sort */}
@@ -182,7 +184,10 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                             >
                                 <span>Linked to</span>
                                 <svg
-                                    className={`w-3.5 h-3.5 transition-transform duration-200 ${filterTypeOpen === 'links' ? 'rotate-180' : ''}`}
+                                    className={classNames(
+                                        'w-3.5 h-3.5 transition-transform duration-200',
+                                        filterTypeOpen === 'links' ? 'rotate-180' : '',
+                                    )}
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -196,9 +201,10 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                 </svg>
                             </button>
                             <div
-                                className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-                                    filterTypeOpen === 'links' ? 'max-h-[1200px]' : 'max-h-0'
-                                }`}
+                                className={classNames(
+                                    'overflow-hidden transition-[max-height] duration-300 ease-in-out',
+                                    filterTypeOpen === 'links' ? 'max-h-[1200px]' : 'max-h-0',
+                                )}
                             >
                                 <div className="space-y-1.5 pt-2">
                                     {params.links.map(link => (

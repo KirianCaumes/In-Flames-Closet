@@ -5,6 +5,7 @@ import { useMemo, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
+import classNames from 'classnames'
 import ItemCard from 'components/item-card'
 import ItemFilters from 'components/item-filters'
 import Pagination from 'components/pagination'
@@ -197,8 +198,13 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                         ) : (
                             <>
                                 <div
-                                    // eslint-disable-next-line max-len
-                                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150 ${isPending ? 'opacity-50' : 'opacity-100'}`}
+                                    className={classNames(
+                                        'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150',
+                                        {
+                                            'opacity-50': isPending,
+                                            'opacity-100': !isPending,
+                                        },
+                                    )}
                                 >
                                     {pagedItems.map(item => (
                                         <ItemCard
