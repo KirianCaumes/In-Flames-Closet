@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useMemo, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -81,12 +81,11 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
-    const deferredFilters = useDeferredValue(filters)
-    const isStale = filters !== deferredFilters
+    const [isPending, startTransition] = useTransition()
+    const filters = filtersFromParams(searchParams)
 
     const { pagedItems, total, pages } = useMemo(() => {
-        const { links, categories, years, sort, title, page } = deferredFilters
+        const { links, categories, years, sort, title, page } = filters
 
         let filtered = items.filter(
             item =>
@@ -108,16 +107,17 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
             total: filteredTotal,
             pages: filteredPages,
         }
-    }, [items, deferredFilters])
+    }, [items, filters])
 
     /**
      * Updates filters state and syncs the new filter values to the URL.
      * @param next - New filter values to apply
      */
     function handleFiltersChange(next: Filters) {
-        setFilters(next)
         const qs = paramsFromFilters(next)
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+        startTransition(() => {
+            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+        })
     }
 
     return (
@@ -198,7 +198,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                             <>
                                 <div
                                     // eslint-disable-next-line max-len
-                                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150 ${isStale ? 'opacity-50' : 'opacity-100'}`}
+                                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150 ${isPending ? 'opacity-50' : 'opacity-100'}`}
                                 >
                                     {pagedItems.map(item => (
                                         <ItemCard
