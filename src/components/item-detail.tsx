@@ -212,7 +212,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                 {item.title || 'Unknown'}
                             </h1>
                             {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-                            {navigator.share && (
+                            {typeof window !== 'undefined' && navigator.share && (
                                 <button
                                     aria-label="Share"
                                     // eslint-disable-next-line max-len

@@ -117,7 +117,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     function handleFiltersChange(next: Filters) {
         const qs = paramsFromFilters(next)
         startTransition(() => {
-            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: true })
         })
     }
 

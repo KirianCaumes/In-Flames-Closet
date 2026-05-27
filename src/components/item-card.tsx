@@ -1,5 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import classNames from 'classnames'
 import CategoryIcon from 'components/category-icon'
 import albums from 'lib/albums'
 import type { Item } from 'lib/database'
@@ -14,6 +18,7 @@ export default function ItemCard({
     /** The item to be displayed */
     readonly item: Item
 }) {
+    const [isHovered, setIsHovered] = useState(false)
     const albumCover = albums[item.link]
 
     const shortLink =
@@ -31,15 +36,39 @@ export default function ItemCard({
                 href={`/${item.folderId}`}
                 title={item.title}
             >
-                <div className="relative h-52 overflow-hidden bg-stone-900 border-b border-stone-800">
+                <div
+                    className="relative h-52 overflow-hidden bg-stone-900 border-b border-stone-800"
+                    onMouseEnter={() => {
+                        setIsHovered(true)
+                    }}
+                    onMouseLeave={() => {
+                        setIsHovered(false)
+                    }}
+                >
                     <Image
                         alt={item.title}
-                        className="object-contain hover:scale-105 transition-transform duration-300 color-transparent"
+                        className={classNames(
+                            'absolute inset-0 object-contain transition-opacity duration-300 color-transparent',
+                            isHovered && item.imagesId[1] ? 'opacity-0' : 'opacity-100',
+                        )}
                         fill
                         loading="lazy"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         src={`/image/${item.folderId}/${item.imagesId[0]}`}
                     />
+                    {item.imagesId[1] && (
+                        <Image
+                            alt={`${item.title} - alternate`}
+                            className={classNames(
+                                'absolute inset-0 object-contain transition-opacity duration-300 color-transparent',
+                                isHovered ? 'opacity-100' : 'opacity-0',
+                            )}
+                            fill
+                            loading="lazy"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            src={`/image/${item.folderId}/${item.imagesId[1]}`}
+                        />
+                    )}
                 </div>
             </Link>
 
