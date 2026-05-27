@@ -17,10 +17,7 @@ const uploadSchema = z.object({
             f => (ALLOWED_MIME_TYPES as ReadonlyArray<string>).includes(f.type),
             `Image must be one of: ${ALLOWED_MIME_TYPES.join(', ')}`,
         )
-        .refine(
-            f => /^[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/.test(f.name),
-            'Image filename must contain only safe characters',
-        ),
+        .refine(f => /^[a-zA-Z0-9_-]+$/.test(f.name), 'Image filename must contain only safe characters'),
 })
 
 /**
