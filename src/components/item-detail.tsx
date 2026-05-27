@@ -290,6 +290,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                                 <Link
                                                     className="hover:text-brand-400 transition-colors truncate"
                                                     href={row.href}
+                                                    prefetch={false}
                                                 >
                                                     {row.value}
                                                 </Link>
