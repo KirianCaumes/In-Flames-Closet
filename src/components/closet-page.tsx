@@ -16,7 +16,8 @@ import type { Filters, Item, Params } from 'lib/database'
 // eslint-disable-next-line react-refresh/only-export-components
 export const DEFAULT_LIMIT = 60
 
-const DEFAULT_FILTERS: Filters = { page: 1, links: [], years: [], categories: [], sort: 'new', title: '' }
+// eslint-disable-next-line react-refresh/only-export-components
+export const DEFAULT_FILTERS: Filters = { page: 1, links: [], years: [], categories: [], sort: 'new', title: '' }
 
 /**
  * Parses URL search parameters into a Filters object.
@@ -85,10 +86,10 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
 
     const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
     const deferredFilters = useDeferredValue(filters)
-    const isPending = filters !== deferredFilters
+    const isStale = filters !== deferredFilters
 
     const { pagedItems, total, pages } = useMemo(() => {
-        const { links, categories, years, sort, title, page } = filters
+        const { links, categories, years, sort, title, page } = deferredFilters
 
         let filtered = items.filter(
             item =>
@@ -110,20 +111,18 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
             total: filteredTotal,
             pages: filteredPages,
         }
-    }, [items, filters])
+    }, [items, deferredFilters])
 
     /**
      * Updates filters state and syncs the new filter values to the URL.
      * @param next - New filter values to apply
      * @param replace - Whether to replace the current history entry
      */
-    function handleFiltersChange(next: Filters, replace = false) {
-        setFilters(next)
-        const qs = paramsFromFilters(next)
+    function handleFiltersChange(next: Partial<Filters>, replace = true) {
+        setFilters(prev => ({ ...prev, ...next }))
+        const qs = paramsFromFilters({ ...filters, ...next })
         if (replace) {
             router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: true })
-        } else {
-            window.scrollTo({ top: 0, behavior: 'instant' })
         }
     }
 
@@ -165,7 +164,6 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                             <ItemFilters
                                 defaultOpen={device === 'desktop'}
                                 filters={filters}
-                                isPending={false}
                                 onFiltersChange={handleFiltersChange}
                                 params={params}
                                 total={total}
@@ -207,8 +205,8 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                     className={classNames(
                                         'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150',
                                         {
-                                            'opacity-50': isPending,
-                                            'opacity-100': !isPending,
+                                            'opacity-50': isStale,
+                                            'opacity-100': !isStale,
                                         },
                                     )}
                                 >
@@ -221,9 +219,8 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                 </div>
                                 <div className="mt-8">
                                     <Pagination
-                                        filters={filters}
                                         onFiltersChange={next => {
-                                            handleFiltersChange(next, false)
+                                            handleFiltersChange({ ...filters, ...next }, false)
                                         }}
                                         pages={pages}
                                     />

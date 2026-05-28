@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
 import CategoryIcon from 'components/category-icon'
 import albums from 'lib/albums'
-import { DEFAULT_LIMIT } from 'components/closet-page'
+import { DEFAULT_FILTERS, DEFAULT_LIMIT } from 'components/closet-page'
 import type { Filters, Params } from 'lib/database'
 
 interface ItemFiltersProps {
@@ -19,9 +19,7 @@ interface ItemFiltersProps {
     /** Whether the filter panel is open by default (server-detected from User-Agent) */
     readonly defaultOpen: boolean
     /** Callback to update filters and sync to URL */
-    readonly onFiltersChange: (next: Filters) => void
-    /** Whether a transition is pending */
-    readonly isPending: boolean
+    readonly onFiltersChange: (next: Partial<Filters>) => void
 }
 
 /**
@@ -29,7 +27,7 @@ interface ItemFiltersProps {
  * Syncs state to URL query parameters via router.push.
  * @returns The rendered filter sidebar with sections for title search, linked albums, years and categories, and a sort dropdown.
  */
-export default function ItemFilters({ filters, params, total, defaultOpen, onFiltersChange, isPending }: ItemFiltersProps) {
+export default function ItemFilters({ filters, params, total, defaultOpen, onFiltersChange }: ItemFiltersProps) {
     const router = useRouter()
     const titleInputRef = useRef<HTMLInputElement>(null)
 
@@ -71,7 +69,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
         if (titleInputRef.current) {
             titleInputRef.current.value = ''
         }
-        onFiltersChange({ page: 1, links: [], years: [], categories: [], sort: 'new', title: '' })
+        onFiltersChange(DEFAULT_FILTERS)
     }, [onFiltersChange])
 
     const isFiltered = Object.entries(filters).some(([key, value]) => {
@@ -143,7 +141,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                             // eslint-disable-next-line max-len
                             className="text-xs bg-stone-800 border border-stone-700 text-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-brand-500 cursor-pointer"
                             onChange={({ target }) => {
-                                onFiltersChange({ ...filters, sort: target.value as Filters['sort'], page: 1 })
+                                onFiltersChange({ sort: target.value as Filters['sort'], page: 1 })
                             }}
                             value={filters.sort}
                         >
@@ -160,18 +158,60 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                         >
                             Title
                         </label>
-                        <input
-                            // eslint-disable-next-line max-len
-                            className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
-                            defaultValue={filters.title}
-                            id="filter-title"
-                            onChange={({ target }) => {
-                                onFiltersChange({ ...filters, title: target.value, page: 1 })
-                            }}
-                            placeholder="Search title..."
-                            ref={titleInputRef}
-                            type="search"
-                        />
+                        <div className="relative">
+                            <input
+                                // eslint-disable-next-line max-len
+                                className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
+                                defaultValue={filters.title}
+                                id="filter-title"
+                                onChange={({ target }) => {
+                                    onFiltersChange({ title: target.value, page: 1 })
+                                }}
+                                placeholder="Search title..."
+                                ref={titleInputRef}
+                                type="text"
+                            />
+                            {filters.title ? (
+                                <button
+                                    aria-label={`Clear ${filters.title.toLowerCase()}`}
+                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-brand-500 cursor-pointer"
+                                    onClick={() => {
+                                        onFiltersChange({ title: '', page: 1 })
+                                    }}
+                                    type="button"
+                                >
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            d="M6 18L18 6M6 6l12 12"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                        />
+                                    </svg>
+                                </button>
+                            ) : (
+                                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                        />
+                                    </svg>
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Linked to (album) */}
@@ -212,10 +252,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                 <div className="space-y-1.5 pt-2">
                                     {params.links.map(link => (
                                         <label
-                                            className={classNames('flex items-center gap-2 group', {
-                                                'cursor-pointer': !isPending,
-                                                'cursor-not-allowed opacity-60': isPending,
-                                            })}
+                                            className="flex items-center gap-2 group cursor-pointer"
                                             key={link}
                                             onMouseEnter={() => {
                                                 router.prefetch(
@@ -231,10 +268,8 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                             <input
                                                 checked={filters.links.includes(link)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer min-w-4"
-                                                disabled={isPending}
                                                 onChange={({ target }) => {
                                                     onFiltersChange({
-                                                        ...filters,
                                                         links: target.checked
                                                             ? [...filters.links, link]
                                                             : filters.links.filter(x => x !== link),
@@ -272,12 +307,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                     />
                                                 </svg>
                                             )}
-                                            <span
-                                                className={classNames('text-sm transition-colors truncate', {
-                                                    'text-stone-400 group-hover:text-stone-200': !isPending,
-                                                    'text-stone-500': isPending,
-                                                })}
-                                            >
+                                            <span className="text-sm transition-colors truncate text-stone-400 group-hover:text-stone-200">
                                                 {link}
                                             </span>
                                         </label>
@@ -321,10 +351,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                 <div className="space-y-1.5 pt-2">
                                     {params.categories.map(category => (
                                         <label
-                                            className={classNames('flex items-center gap-2 group', {
-                                                'cursor-pointer': !isPending,
-                                                'cursor-not-allowed opacity-60': isPending,
-                                            })}
+                                            className="flex items-center gap-2 group cursor-pointer"
                                             key={category}
                                             onMouseEnter={() => {
                                                 router.prefetch(
@@ -340,10 +367,8 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                             <input
                                                 checked={filters.categories.includes(category)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer"
-                                                disabled={isPending}
                                                 onChange={({ target }) => {
                                                     onFiltersChange({
-                                                        ...filters,
                                                         categories: target.checked
                                                             ? [...filters.categories, category]
                                                             : filters.categories.filter(x => x !== category),
@@ -352,20 +377,10 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 }}
                                                 type="checkbox"
                                             />
-                                            <span
-                                                className={classNames('transition-colors flex items-center', {
-                                                    'text-stone-400 group-hover:text-stone-200': !isPending,
-                                                    'text-stone-500': isPending,
-                                                })}
-                                            >
+                                            <span className="transition-colors flex items-center text-stone-400 group-hover:text-stone-200">
                                                 <CategoryIcon name={category} />
                                             </span>
-                                            <span
-                                                className={classNames('text-sm transition-colors', {
-                                                    'text-stone-400 group-hover:text-stone-200': !isPending,
-                                                    'text-stone-500': isPending,
-                                                })}
-                                            >
+                                            <span className="text-sm transition-colors text-stone-400 group-hover:text-stone-200">
                                                 {category}
                                             </span>
                                         </label>

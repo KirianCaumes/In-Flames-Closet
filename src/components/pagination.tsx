@@ -7,12 +7,10 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import type { Filters } from 'lib/database'
 
 interface PaginationProps {
-    /** Current active filters (used to preserve them in page links) */
-    readonly filters: Filters
     /** Total number of pages */
     readonly pages: number
     /** Callback to update filters and sync to URL */
-    readonly onFiltersChange: (next: Filters) => void
+    readonly onFiltersChange: (next: Partial<Filters>) => void
 }
 
 /**
@@ -37,12 +35,12 @@ function buildPageUrl(pathname: string, params: URLSearchParams, page: number): 
  * Tailwind pagination component that preserves all active filter params
  * @returns The pagination navigation element, or null if there's only one page
  */
-export default function Pagination({ filters, pages, onFiltersChange }: PaginationProps) {
+export default function Pagination({ pages, onFiltersChange }: PaginationProps) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const page = filters.page ?? 1
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
 
     const hasPrev = page > 1
     const hasNext = page < pages
@@ -89,7 +87,7 @@ export default function Pagination({ filters, pages, onFiltersChange }: Paginati
                     className={arrowCls(true)}
                     href={buildPageUrl(pathname, searchParams, page - 1)}
                     onClick={() => {
-                        onFiltersChange({ ...filters, page: page - 1 })
+                        onFiltersChange({ page: page - 1 })
                     }}
                 >
                     <svg
@@ -150,7 +148,7 @@ export default function Pagination({ filters, pages, onFiltersChange }: Paginati
                         href={buildPageUrl(pathname, searchParams, p)}
                         key={p}
                         onClick={() => {
-                            onFiltersChange({ ...filters, page: p })
+                            onFiltersChange({ page: p })
                         }}
                         scroll
                     >
@@ -165,7 +163,7 @@ export default function Pagination({ filters, pages, onFiltersChange }: Paginati
                     className={arrowCls(true)}
                     href={buildPageUrl(pathname, searchParams, page + 1)}
                     onClick={() => {
-                        onFiltersChange({ ...filters, page: page + 1 })
+                        onFiltersChange({ page: page + 1 })
                     }}
                 >
                     <svg
