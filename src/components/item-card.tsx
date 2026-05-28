@@ -9,6 +9,42 @@ import albums from 'lib/albums'
 import type { Item } from 'lib/database'
 
 /**
+ * Default placeholder thumbnail shown before actual image loads or if no image is available.
+ * @returns JSX.Element
+ */
+export function DefaultThumbnail({
+    size = 'normal',
+}: {
+    /**
+     * Size of the thumbnail
+     * @default 'normal'
+     */
+    readonly size?: 'normal' | 'small'
+}) {
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-stone-900 to-stone-800">
+            <svg
+                className={classNames('w-8 h-8 text-stone-700', {
+                    'scale-[1]': size === 'normal',
+                    'scale-[0.5]': size === 'small',
+                })}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    // eslint-disable-next-line max-len
+                    d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                />
+            </svg>
+        </div>
+    )
+}
+
+/**
  * Renders an item card linking to the detail page
  * @returns An article element representing the item, with image, title, category icon and album link
  */
@@ -19,7 +55,13 @@ export default function ItemCard({
     readonly item: Item
 }) {
     const [isHovered, setIsHovered] = useState(false)
+    const [statusImages, setStatusImages] = useState<Map<string, 'error' | 'resolved' | undefined>>(new Map())
+
     const albumCover = albums[item.link]
+
+    const updateImageStatus = (imageId: string, status: 'error' | 'resolved' | undefined) => {
+        setStatusImages(prev => new Map(prev).set(imageId, status))
+    }
 
     const shortLink =
         item.link.length > 10 && item.link.split(' ').length > 1
@@ -45,29 +87,50 @@ export default function ItemCard({
                         setIsHovered(false)
                     }}
                 >
-                    <Image
-                        alt={item.title}
-                        className={classNames(
-                            'absolute inset-0 object-contain transition-opacity duration-300 color-transparent',
-                            isHovered && item.imagesId[1] ? 'opacity-0' : 'opacity-100',
-                        )}
-                        fill
-                        loading="lazy"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        src={`/image/${item.folderId}/${item.imagesId[0]}`}
-                    />
-                    {item.imagesId[1] && (
-                        <Image
-                            alt={`${item.title} - alternate`}
-                            className={classNames(
-                                'absolute inset-0 object-contain transition-opacity duration-300 color-transparent',
-                                isHovered ? 'opacity-100' : 'opacity-0',
+                    <DefaultThumbnail />
+                    {statusImages.get(item.imagesId[0]) !== 'error' && (
+                        <>
+                            <Image
+                                alt={item.title}
+                                className={classNames('absolute inset-0 object-contain transition-opacity duration-300 text-transparent', {
+                                    'opacity-0':
+                                        !statusImages.get(item.imagesId[0]) ||
+                                        (isHovered && item.imagesId[1] && statusImages.get(item.imagesId[1]) !== 'error'),
+                                    'opacity-100':
+                                        statusImages.get(item.imagesId[0]) === 'resolved' &&
+                                        !(isHovered && item.imagesId[1] && statusImages.get(item.imagesId[1]) !== 'error'),
+                                })}
+                                fill
+                                loading="lazy"
+                                onError={() => {
+                                    updateImageStatus(item.imagesId[0], 'error')
+                                }}
+                                onLoad={() => {
+                                    updateImageStatus(item.imagesId[0], 'resolved')
+                                }}
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                src={`/image/${item.folderId}/${item.imagesId[0]}`}
+                            />
+                            {item.imagesId[1] && (
+                                <Image
+                                    alt={`${item.title} - alternate`}
+                                    className={classNames(
+                                        'absolute inset-0 object-contain transition-opacity duration-300 text-transparent',
+                                        isHovered ? 'opacity-100' : 'opacity-0',
+                                    )}
+                                    fill
+                                    loading="lazy"
+                                    onError={() => {
+                                        updateImageStatus(item.imagesId[1], 'error')
+                                    }}
+                                    onLoad={() => {
+                                        updateImageStatus(item.imagesId[1], 'resolved')
+                                    }}
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    src={`/image/${item.folderId}/${item.imagesId[1]}`}
+                                />
                             )}
-                            fill
-                            loading="lazy"
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            src={`/image/${item.folderId}/${item.imagesId[1]}`}
-                        />
+                        </>
                     )}
                 </div>
             </Link>

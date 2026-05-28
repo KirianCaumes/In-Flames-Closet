@@ -26,3 +26,9 @@
         background: #57534e;
     }
 }
+
+html,
+body {
+    /* Disables Firefox/Chrome automatic element anchoring during hydration */
+    overflow-anchor: none !important;
+}

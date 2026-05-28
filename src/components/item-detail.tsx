@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { DefaultThumbnail } from 'components/item-card'
 import CategoryIcon from 'components/category-icon'
 import albums from 'lib/albums'
 import type { Item } from 'lib/database'
@@ -22,7 +23,12 @@ interface ItemDetailProps {
 export default function ItemDetail({ item }: ItemDetailProps) {
     const router = useRouter()
     const [activeIndex, setActiveIndex] = useState(0)
+    const [statusImages, setStatusImages] = useState<Map<string, 'error' | 'resolved' | undefined>>(new Map())
     const albumCover = albums[item.link]
+
+    const updateImageStatus = (imageId: string, status: 'error' | 'resolved' | undefined) => {
+        setStatusImages(prev => new Map(prev).set(imageId, status))
+    }
 
     return (
         <div className="min-h-screen">
@@ -87,15 +93,27 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                     <div className="w-full lg:w-1/2 space-y-3">
                         {/* Main image */}
                         <div className="relative bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden aspect-square">
+                            <DefaultThumbnail />
                             {/* Main image */}
-                            <Image
-                                alt={item.title}
-                                className="object-contain color-transparent"
-                                fill
-                                loading="eager"
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                                src={`/image/${item.folderId}/${item.imagesId[activeIndex]}`}
-                            />
+                            {statusImages.get(`main-${activeIndex}`) !== 'error' && (
+                                <Image
+                                    alt={item.title}
+                                    className={classNames('object-contain text-transparent transition-opacity duration-300', {
+                                        'opacity-0': !statusImages.get(`main-${activeIndex}`),
+                                        'opacity-100': statusImages.get(`main-${activeIndex}`) === 'resolved',
+                                    })}
+                                    fill
+                                    loading="eager"
+                                    onError={() => {
+                                        updateImageStatus(`main-${activeIndex}`, 'error')
+                                    }}
+                                    onLoad={() => {
+                                        updateImageStatus(`main-${activeIndex}`, 'resolved')
+                                    }}
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
+                                    src={`/image/${item.folderId}/${item.imagesId[activeIndex]}`}
+                                />
+                            )}
 
                             {/* Prev / next arrows */}
                             {item.imagesId.length > 1 && (
@@ -154,8 +172,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                                 aria-label={`Image ${i + 1}`}
                                                 className={classNames('w-2 h-2 rounded-full transition-colors cursor-pointer', {
                                                     'bg-brand-500': i === activeIndex,
-                                                    'bg-stone-600': i !== activeIndex,
-                                                    'hover:bg-stone-400': i !== activeIndex,
+                                                    'bg-stone-600 hover:bg-stone-400': i !== activeIndex,
                                                 })}
                                                 // eslint-disable-next-line react/no-array-index-key
                                                 key={i}
@@ -179,8 +196,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                             'relative shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer',
                                             {
                                                 'border-brand-500': i === activeIndex,
-                                                'border-stone-700': i !== activeIndex,
-                                                'hover:border-stone-500': i !== activeIndex,
+                                                'border-stone-700 hover:border-stone-500': i !== activeIndex,
                                             },
                                         )}
                                         // eslint-disable-next-line react/no-array-index-key
@@ -190,14 +206,26 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                         }}
                                         type="button"
                                     >
-                                        <Image
-                                            alt={`${item.title} - image ${i + 1}`}
-                                            className="object-cover color-transparent"
-                                            fill
-                                            loading="lazy"
-                                            sizes="64px"
-                                            src={`/image/${item.folderId}/${imgId}`}
-                                        />
+                                        <DefaultThumbnail size="small" />
+                                        {statusImages.get(`thumb-${imgId}`) !== 'error' && (
+                                            <Image
+                                                alt={`${item.title} - image ${i + 1}`}
+                                                className={classNames('object-cover text-transparent transition-opacity duration-300', {
+                                                    'opacity-0': !statusImages.get(`thumb-${imgId}`),
+                                                    'opacity-100': statusImages.get(`thumb-${imgId}`) === 'resolved',
+                                                })}
+                                                fill
+                                                loading="lazy"
+                                                onError={() => {
+                                                    updateImageStatus(`thumb-${imgId}`, 'error')
+                                                }}
+                                                onLoad={() => {
+                                                    updateImageStatus(`thumb-${imgId}`, 'resolved')
+                                                }}
+                                                sizes="64px"
+                                                src={`/image/${item.folderId}/${imgId}`}
+                                            />
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -271,7 +299,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                     icon: albumCover ? (
                                         <Image
                                             alt={item.link}
-                                            className="rounded-sm object-cover color-transparent"
+                                            className="rounded-sm object-cover text-transparent"
                                             height={16}
                                             loading="lazy"
                                             src={albumCover}

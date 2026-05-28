@@ -11,6 +11,8 @@ interface PaginationProps {
     readonly filters: Filters
     /** Total number of pages */
     readonly pages: number
+    /** Callback to update filters and sync to URL */
+    readonly onFiltersChange: (next: Filters) => void
 }
 
 /**
@@ -35,7 +37,7 @@ function buildPageUrl(pathname: string, params: URLSearchParams, page: number): 
  * Tailwind pagination component that preserves all active filter params
  * @returns The pagination navigation element, or null if there's only one page
  */
-export default function Pagination({ filters, pages }: PaginationProps) {
+export default function Pagination({ filters, pages, onFiltersChange }: PaginationProps) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
@@ -86,6 +88,9 @@ export default function Pagination({ filters, pages }: PaginationProps) {
                     aria-label="Previous page"
                     className={arrowCls(true)}
                     href={buildPageUrl(pathname, searchParams, page - 1)}
+                    onClick={() => {
+                        onFiltersChange({ ...filters, page: page - 1 })
+                    }}
                 >
                     <svg
                         className="w-4 h-4"
@@ -144,6 +149,10 @@ export default function Pagination({ filters, pages }: PaginationProps) {
                         )}
                         href={buildPageUrl(pathname, searchParams, p)}
                         key={p}
+                        onClick={() => {
+                            onFiltersChange({ ...filters, page: p })
+                        }}
+                        scroll
                     >
                         {p}
                     </Link>
@@ -155,6 +164,9 @@ export default function Pagination({ filters, pages }: PaginationProps) {
                     aria-label="Next page"
                     className={arrowCls(true)}
                     href={buildPageUrl(pathname, searchParams, page + 1)}
+                    onClick={() => {
+                        onFiltersChange({ ...filters, page: page + 1 })
+                    }}
                 >
                     <svg
                         className="w-4 h-4"

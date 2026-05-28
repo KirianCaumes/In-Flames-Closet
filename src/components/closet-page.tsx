@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useTransition } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -13,7 +13,8 @@ import Pagination from 'components/pagination'
 import IconSvg from '../../public/favicon.svg'
 import type { Filters, Item, Params } from 'lib/database'
 
-const DEFAULT_LIMIT = 60
+// eslint-disable-next-line react-refresh/only-export-components
+export const DEFAULT_LIMIT = 60
 
 const DEFAULT_FILTERS: Filters = { page: 1, links: [], years: [], categories: [], sort: 'new', title: '' }
 
@@ -82,8 +83,9 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    const [isPending, startTransition] = useTransition()
-    const filters = filtersFromParams(searchParams)
+    const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
+    const deferredFilters = useDeferredValue(filters)
+    const isPending = filters !== deferredFilters
 
     const { pagedItems, total, pages } = useMemo(() => {
         const { links, categories, years, sort, title, page } = filters
@@ -113,12 +115,16 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     /**
      * Updates filters state and syncs the new filter values to the URL.
      * @param next - New filter values to apply
+     * @param replace - Whether to replace the current history entry
      */
-    function handleFiltersChange(next: Filters) {
+    function handleFiltersChange(next: Filters, replace = false) {
+        setFilters(next)
         const qs = paramsFromFilters(next)
-        startTransition(() => {
+        if (replace) {
             router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: true })
-        })
+        } else {
+            window.scrollTo({ top: 0, behavior: 'instant' })
+        }
     }
 
     return (
@@ -159,7 +165,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                             <ItemFilters
                                 defaultOpen={device === 'desktop'}
                                 filters={filters}
-                                limit={DEFAULT_LIMIT}
+                                isPending={false}
                                 onFiltersChange={handleFiltersChange}
                                 params={params}
                                 total={total}
@@ -216,6 +222,9 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                 <div className="mt-8">
                                     <Pagination
                                         filters={filters}
+                                        onFiltersChange={next => {
+                                            handleFiltersChange(next, false)
+                                        }}
                                         pages={pages}
                                     />
                                 </div>

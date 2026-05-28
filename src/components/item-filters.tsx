@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
 import CategoryIcon from 'components/category-icon'
 import albums from 'lib/albums'
-import type { Filters, ItemsResult, Params } from 'lib/database'
+import { DEFAULT_LIMIT } from 'components/closet-page'
+import type { Filters, Params } from 'lib/database'
 
-interface ItemFiltersProps extends Pick<ItemsResult, 'limit'> {
+interface ItemFiltersProps {
     /** Current filter values */
     readonly filters: Filters
     /** Available filter options */
@@ -19,6 +20,8 @@ interface ItemFiltersProps extends Pick<ItemsResult, 'limit'> {
     readonly defaultOpen: boolean
     /** Callback to update filters and sync to URL */
     readonly onFiltersChange: (next: Filters) => void
+    /** Whether a transition is pending */
+    readonly isPending: boolean
 }
 
 /**
@@ -26,7 +29,7 @@ interface ItemFiltersProps extends Pick<ItemsResult, 'limit'> {
  * Syncs state to URL query parameters via router.push.
  * @returns The rendered filter sidebar with sections for title search, linked albums, years and categories, and a sort dropdown.
  */
-export default function ItemFilters({ filters, params, total, limit, defaultOpen, onFiltersChange }: ItemFiltersProps) {
+export default function ItemFilters({ filters, params, total, defaultOpen, onFiltersChange, isPending }: ItemFiltersProps) {
     const router = useRouter()
     const titleInputRef = useRef<HTMLInputElement>(null)
 
@@ -134,7 +137,7 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                     {/* Results summary + sort */}
                     <div className="flex items-center justify-between gap-2">
                         <span className="text-xs text-stone-500">
-                            {Math.min(limit, total)} of {total} result(s)
+                            {Math.min(DEFAULT_LIMIT, total)} of {total} result(s)
                         </span>
                         <select
                             // eslint-disable-next-line max-len
@@ -209,7 +212,10 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                 <div className="space-y-1.5 pt-2">
                                     {params.links.map(link => (
                                         <label
-                                            className="flex items-center gap-2 cursor-pointer group"
+                                            className={classNames('flex items-center gap-2 group', {
+                                                'cursor-pointer': !isPending,
+                                                'cursor-not-allowed opacity-60': isPending,
+                                            })}
                                             key={link}
                                             onMouseEnter={() => {
                                                 router.prefetch(
@@ -225,6 +231,7 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                             <input
                                                 checked={filters.links.includes(link)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer min-w-4"
+                                                disabled={isPending}
                                                 onChange={({ target }) => {
                                                     onFiltersChange({
                                                         ...filters,
@@ -265,7 +272,12 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                                     />
                                                 </svg>
                                             )}
-                                            <span className="text-sm text-stone-400 group-hover:text-stone-200 transition-colors truncate">
+                                            <span
+                                                className={classNames('text-sm transition-colors truncate', {
+                                                    'text-stone-400 group-hover:text-stone-200': !isPending,
+                                                    'text-stone-500': isPending,
+                                                })}
+                                            >
                                                 {link}
                                             </span>
                                         </label>
@@ -309,7 +321,10 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                 <div className="space-y-1.5 pt-2">
                                     {params.categories.map(category => (
                                         <label
-                                            className="flex items-center gap-2 cursor-pointer group"
+                                            className={classNames('flex items-center gap-2 group', {
+                                                'cursor-pointer': !isPending,
+                                                'cursor-not-allowed opacity-60': isPending,
+                                            })}
                                             key={category}
                                             onMouseEnter={() => {
                                                 router.prefetch(
@@ -325,6 +340,7 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                             <input
                                                 checked={filters.categories.includes(category)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer"
+                                                disabled={isPending}
                                                 onChange={({ target }) => {
                                                     onFiltersChange({
                                                         ...filters,
@@ -336,10 +352,20 @@ export default function ItemFilters({ filters, params, total, limit, defaultOpen
                                                 }}
                                                 type="checkbox"
                                             />
-                                            <span className="text-stone-400 group-hover:text-stone-200 transition-colors flex items-center ">
+                                            <span
+                                                className={classNames('transition-colors flex items-center', {
+                                                    'text-stone-400 group-hover:text-stone-200': !isPending,
+                                                    'text-stone-500': isPending,
+                                                })}
+                                            >
                                                 <CategoryIcon name={category} />
                                             </span>
-                                            <span className="text-sm text-stone-400 group-hover:text-stone-200 transition-colors">
+                                            <span
+                                                className={classNames('text-sm transition-colors', {
+                                                    'text-stone-400 group-hover:text-stone-200': !isPending,
+                                                    'text-stone-500': isPending,
+                                                })}
+                                            >
                                                 {category}
                                             </span>
                                         </label>

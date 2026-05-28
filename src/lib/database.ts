@@ -40,8 +40,6 @@ export interface ItemsResult {
     totalAll: number
     /** Total number of pages */
     pages: number
-    /** Items per page */
-    limit: number
 }
 
 export interface Params {
