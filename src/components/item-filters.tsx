@@ -162,7 +162,6 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                             <input
                                 // eslint-disable-next-line max-len
                                 className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
-                                defaultValue={filters.title}
                                 id="filter-title"
                                 onChange={({ target }) => {
                                     onFiltersChange({ title: target.value, page: 1 })
@@ -170,6 +169,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                 placeholder="Search title..."
                                 ref={titleInputRef}
                                 type="text"
+                                value={filters.title}
                             />
                             {filters.title ? (
                                 <button

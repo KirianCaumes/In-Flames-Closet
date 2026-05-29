@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -87,6 +87,29 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
     const deferredFilters = useDeferredValue(filters)
     const isStale = filters !== deferredFilters
+
+    // Sync filters when URL changes (e.g., browser back/forward navigation)
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setFilters(prev => {
+            const newFilters = filtersFromParams(searchParams)
+            // Only update if filters actually changed
+            if (
+                prev.page === newFilters.page &&
+                prev.title === newFilters.title &&
+                prev.sort === newFilters.sort &&
+                prev.links.length === newFilters.links.length &&
+                prev.links.every((l, i) => l === newFilters.links[i]) &&
+                prev.years.length === newFilters.years.length &&
+                prev.years.every((y, i) => y === newFilters.years[i]) &&
+                prev.categories.length === newFilters.categories.length &&
+                prev.categories.every((c, i) => c === newFilters.categories[i])
+            ) {
+                return prev
+            }
+            return newFilters
+        })
+    }, [searchParams])
 
     const { pagedItems, total, pages } = useMemo(() => {
         const { links, categories, years, sort, title, page } = deferredFilters
