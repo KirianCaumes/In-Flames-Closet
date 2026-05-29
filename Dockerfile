@@ -1,6 +1,8 @@
-FROM node:24.15.0-slim
+FROM node:24.16.0-alpine
 
 WORKDIR /app
+
+ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY ./ ./
 
