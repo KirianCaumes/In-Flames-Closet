@@ -1,10 +1,11 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-    images: {
-        minimumCacheTTL: 60 * 60 * 24 * 30,
-    },
     poweredByHeader: false,
+    experimental: {
+        preloadEntriesOnStart: false,
+        webpackMemoryOptimizations: true,
+    },
 }
 
 export default nextConfig

@@ -1,12 +1,15 @@
-FROM node:24.16.0-alpine
+FROM node:24.15.0-slim
 
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY ./ ./
+COPY package*.json ./
 
 RUN npm ci
+
+COPY . .
+
 RUN npm run build
 
 EXPOSE 3000
