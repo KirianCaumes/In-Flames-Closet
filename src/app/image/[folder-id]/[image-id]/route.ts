@@ -47,7 +47,7 @@ export async function GET(
         return new Response(body, {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=86400',
+                'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
             },
         })
     } else {
@@ -70,7 +70,7 @@ export async function GET(
             return new Response(Readable.toWeb(createReadStream(filePath)) as ReadableStream, {
                 headers: {
                     'Content-Type': contentType,
-                    'Cache-Control': 'public, max-age=2592000, immutable',
+                    'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
                 },
             })
         } catch {

@@ -95,24 +95,28 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                         <div className="relative bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden aspect-square">
                             <DefaultThumbnail />
                             {/* Main image */}
-                            {statusImages.get(`main-${activeIndex}`) !== 'error' && (
-                                <Image
-                                    alt={item.title}
-                                    className={classNames('object-contain text-transparent transition-opacity duration-300', {
-                                        'opacity-0': !statusImages.get(`main-${activeIndex}`),
-                                        'opacity-100': statusImages.get(`main-${activeIndex}`) === 'resolved',
-                                    })}
-                                    fill
-                                    loading="eager"
-                                    onError={() => {
-                                        updateImageStatus(`main-${activeIndex}`, 'error')
-                                    }}
-                                    onLoad={() => {
-                                        updateImageStatus(`main-${activeIndex}`, 'resolved')
-                                    }}
-                                    sizes="(max-width: 1024px) 100vw, 50vw"
-                                    src={`/image/${item.folderId}/${item.imagesId[activeIndex]}`}
-                                />
+                            {item.imagesId.map(
+                                (imageId, i) =>
+                                    statusImages.get(`main-${i}`) !== 'error' && (
+                                        <Image
+                                            alt={item.title}
+                                            className={classNames('object-contain text-transparent transition-opacity duration-300', {
+                                                'opacity-0': !statusImages.get(`main-${i}`) || activeIndex !== i,
+                                                'opacity-100': statusImages.get(`main-${i}`) === 'resolved' && activeIndex === i,
+                                            })}
+                                            fill
+                                            key={imageId}
+                                            loading="eager"
+                                            onError={() => {
+                                                updateImageStatus(`main-${i}`, 'error')
+                                            }}
+                                            onLoad={() => {
+                                                updateImageStatus(`main-${i}`, 'resolved')
+                                            }}
+                                            sizes="(max-width: 1024px) 100vw, 50vw"
+                                            src={`/image/${item.folderId}/${imageId}`}
+                                        />
+                                    ),
                             )}
 
                             {/* Prev / next arrows */}
