@@ -1,7 +1,5 @@
-import { createReadStream } from 'node:fs'
-import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
-import { Readable } from 'node:stream'
+import { openAsBlob } from 'node:fs'
 import type { NextRequest } from 'next/server'
 
 const PROD_IMAGE_BASE = 'https://in-flames-closet.kiriancaumes.fr/image'
@@ -38,13 +36,12 @@ export async function GET(
     // In development, proxy from the production site
     if (process.env.NODE_ENV === 'development') {
         const url = `${PROD_IMAGE_BASE}/${encodeURIComponent(folderId)}/${encodeURIComponent(imageId)}`
-        const upstream = await fetch(url)
-        if (!upstream.ok) {
+        const response = await fetch(url)
+        if (!response.ok) {
             return new Response('Not found', { status: 404 })
         }
-        const contentType = upstream.headers.get('content-type') ?? 'image'
-        const body = await upstream.arrayBuffer()
-        return new Response(body, {
+        const contentType = response.headers.get('content-type') ?? 'image'
+        return new Response(response.body, {
             headers: {
                 'Content-Type': contentType,
                 'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
@@ -53,23 +50,11 @@ export async function GET(
     } else {
         try {
             const filePath = join(process.cwd(), 'upload', folderId, imageId)
-            await stat(filePath)
+            const fileBlob = await openAsBlob(filePath)
 
-            // Determine MIME type from extension
-            const ext = imageId.split('.').pop()?.toLowerCase() ?? ''
-            const mimeMap: Record<string, string> = {
-                jpg: 'image/jpeg',
-                jpeg: 'image/jpeg',
-                png: 'image/png',
-                gif: 'image/gif',
-                webp: 'image/webp',
-                avif: 'image/avif',
-            }
-            const contentType = mimeMap[ext] ?? 'image'
-
-            return new Response(Readable.toWeb(createReadStream(filePath)) as ReadableStream, {
+            return new Response(fileBlob, {
                 headers: {
-                    'Content-Type': contentType,
+                    'Content-Type': 'image',
                     // Not useful when the image is served from the Next.js image optimization API "<Image />" component, but still good for direct access
                     'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
                 },
