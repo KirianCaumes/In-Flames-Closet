@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm ci
 
 # Create non-root user for security
-RUN useradd -m -u 10001 usr
+RUN adduser -D -u 10001 usr
 RUN chown usr:usr /app
 
 COPY --chown=usr:usr . .
