@@ -70,6 +70,7 @@ export async function GET(
             return new Response(Readable.toWeb(createReadStream(filePath)) as ReadableStream, {
                 headers: {
                     'Content-Type': contentType,
+                    // Not useful when the image is served from the Next.js image optimization API "<Image />" component, but still good for direct access
                     'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
                 },
             })
