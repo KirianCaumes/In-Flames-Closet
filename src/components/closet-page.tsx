@@ -139,13 +139,13 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     /**
      * Updates filters state and syncs the new filter values to the URL.
      * @param next - New filter values to apply
-     * @param replace - Whether to replace the current history entry
+     * @param type - Whether to push a new history entry or replace the current one (default: push)
      */
-    function handleFiltersChange(next: Partial<Filters>, replace = true) {
+    function handleFiltersChange(next: Partial<Filters>, type: 'push' | 'replace' | null = 'push') {
         setFilters(prev => ({ ...prev, ...next }))
         const qs = paramsFromFilters({ ...filters, ...next })
-        if (replace) {
-            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: true })
+        if (type) {
+            router[type](qs ? `${pathname}?${qs}` : pathname, { scroll: true })
         }
     }
 
@@ -215,7 +215,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                 <button
                                     className="text-sm text-brand-500 hover:text-brand-400 underline underline-offset-2 transition-colors cursor-pointer"
                                     onClick={() => {
-                                        handleFiltersChange(DEFAULT_FILTERS)
+                                        handleFiltersChange(DEFAULT_FILTERS, 'push')
                                     }}
                                     type="button"
                                 >
@@ -243,7 +243,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                 <div className="mt-8">
                                     <Pagination
                                         onFiltersChange={next => {
-                                            handleFiltersChange({ ...filters, ...next }, false)
+                                            handleFiltersChange({ ...filters, ...next }, null)
                                         }}
                                         pages={pages}
                                     />

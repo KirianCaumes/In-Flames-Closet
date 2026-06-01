@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
+import { useDebounce } from 'react-use'
 import CategoryIcon from 'components/category-icon'
 import albums from 'lib/albums'
 import { DEFAULT_FILTERS, DEFAULT_LIMIT } from 'components/closet-page'
@@ -19,7 +20,7 @@ interface ItemFiltersProps {
     /** Whether the filter panel is open by default (server-detected from User-Agent) */
     readonly defaultOpen: boolean
     /** Callback to update filters and sync to URL */
-    readonly onFiltersChange: (next: Partial<Filters>) => void
+    readonly onFiltersChange: (next: Partial<Filters>, type: 'push' | 'replace' | null) => void
 }
 
 /**
@@ -30,6 +31,8 @@ interface ItemFiltersProps {
 export default function ItemFilters({ filters, params, total, defaultOpen, onFiltersChange }: ItemFiltersProps) {
     const router = useRouter()
     const titleInputRef = useRef<HTMLInputElement>(null)
+    const [debouncedTitle, setDebouncedTitle] = useState(filters.title)
+    const isUserTypingTitle = useRef(false)
 
     const [isFiltersOpen, setIsFiltersOpen] = useState(defaultOpen)
 
@@ -66,11 +69,29 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
     )
 
     const reset = useCallback(() => {
-        if (titleInputRef.current) {
-            titleInputRef.current.value = ''
-        }
-        onFiltersChange(DEFAULT_FILTERS)
+        setDebouncedTitle('')
+        onFiltersChange(DEFAULT_FILTERS, 'push')
     }, [onFiltersChange])
+
+    // Debounce title input to avoid excessive URL updates while typing
+    useDebounce(
+        () => {
+            isUserTypingTitle.current = false
+            if (debouncedTitle !== filters.title) {
+                // TODO test ca
+                onFiltersChange({ title: debouncedTitle, page: 1 }, filters.title ? 'replace' : 'push')
+            }
+        },
+        200,
+        [debouncedTitle],
+    )
+    // Keep debouncedTitle in sync with external filters changes (e.g. when back/forward navigation)
+    useEffect(() => {
+        if (!isUserTypingTitle.current) {
+            // eslint-disable-next-line react-you-might-not-need-an-effect/no-derived-state
+            setDebouncedTitle(filters.title)
+        }
+    }, [filters.title])
 
     const isFiltered = Object.entries(filters).some(([key, value]) => {
         if (key === 'sort') {
@@ -141,7 +162,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                             // eslint-disable-next-line max-len
                             className="text-xs bg-stone-800 border border-stone-700 text-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-brand-500 cursor-pointer"
                             onChange={({ target }) => {
-                                onFiltersChange({ sort: target.value as Filters['sort'], page: 1 })
+                                onFiltersChange({ sort: target.value as Filters['sort'], page: 1 }, 'push')
                             }}
                             value={filters.sort}
                         >
@@ -161,22 +182,23 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                         <div className="relative">
                             <input
                                 // eslint-disable-next-line max-len
-                                className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
+                                className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 rounded-xl px-3 py-2 text-sm pr-9 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
                                 id="filter-title"
                                 onChange={({ target }) => {
-                                    onFiltersChange({ title: target.value, page: 1 })
+                                    isUserTypingTitle.current = true
+                                    setDebouncedTitle(target.value)
                                 }}
                                 placeholder="Search title..."
                                 ref={titleInputRef}
                                 type="text"
-                                value={filters.title}
+                                value={debouncedTitle}
                             />
                             {filters.title ? (
                                 <button
                                     aria-label={`Clear ${filters.title.toLowerCase()}`}
                                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-brand-500 cursor-pointer"
                                     onClick={() => {
-                                        onFiltersChange({ title: '', page: 1 })
+                                        onFiltersChange({ title: '', page: 1 }, 'push')
                                     }}
                                     type="button"
                                 >
@@ -269,12 +291,15 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 checked={filters.links.includes(link)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer min-w-4"
                                                 onChange={({ target }) => {
-                                                    onFiltersChange({
-                                                        links: target.checked
-                                                            ? [...filters.links, link]
-                                                            : filters.links.filter(x => x !== link),
-                                                        page: 1,
-                                                    })
+                                                    onFiltersChange(
+                                                        {
+                                                            links: target.checked
+                                                                ? [...filters.links, link]
+                                                                : filters.links.filter(x => x !== link),
+                                                            page: 1,
+                                                        },
+                                                        'push',
+                                                    )
                                                 }}
                                                 type="checkbox"
                                             />
@@ -368,12 +393,15 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 checked={filters.categories.includes(category)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer"
                                                 onChange={({ target }) => {
-                                                    onFiltersChange({
-                                                        categories: target.checked
-                                                            ? [...filters.categories, category]
-                                                            : filters.categories.filter(x => x !== category),
-                                                        page: 1,
-                                                    })
+                                                    onFiltersChange(
+                                                        {
+                                                            categories: target.checked
+                                                                ? [...filters.categories, category]
+                                                                : filters.categories.filter(x => x !== category),
+                                                            page: 1,
+                                                        },
+                                                        'push',
+                                                    )
                                                 }}
                                                 type="checkbox"
                                             />
