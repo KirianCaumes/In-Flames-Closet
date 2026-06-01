@@ -1,5 +1,6 @@
+import { createReadStream } from 'node:fs'
+import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
-import { openAsBlob } from 'node:fs'
 import type { NextRequest } from 'next/server'
 
 const PROD_IMAGE_BASE = 'https://in-flames-closet.kiriancaumes.fr/image'
@@ -8,11 +9,11 @@ const PROD_IMAGE_BASE = 'https://in-flames-closet.kiriancaumes.fr/image'
  * Serve a file from the local upload directory.
  * In development, proxies from the production site instead.
  * URL pattern: /image/[folder-id]/[image-id]
- * @param _req The incoming request (not used)
+ * @param req The incoming request
  * @returns The image file or an error response
  */
 export async function GET(
-    _req: NextRequest,
+    req: NextRequest,
     {
         params,
     }: {
@@ -50,11 +51,40 @@ export async function GET(
     } else {
         try {
             const filePath = join(process.cwd(), 'upload', folderId, imageId)
-            const fileBlob = await openAsBlob(filePath)
+            const stats = await stat(filePath)
 
-            return new Response(fileBlob, {
+            // Build a weak ETag from mtime + size (same strategy as express.static)
+            const etag = `W/"${stats.mtime.getTime().toString(16)}-${stats.size.toString(16)}"`
+            const lastModified = stats.mtime.toUTCString()
+
+            // Conditional GET support
+            if (req.headers.get('if-none-match') === etag) {
+                return new Response(null, { status: 304 })
+            }
+
+            const nodeStream = createReadStream(filePath)
+            const readableStream = new ReadableStream<Uint8Array>({
+                start(controller) {
+                    nodeStream.on('data', (chunk: Buffer | string) => {
+                        controller.enqueue(new Uint8Array(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)))
+                    })
+                    nodeStream.on('end', () => {
+                        controller.close()
+                    })
+                    nodeStream.on('error', err => {
+                        controller.error(err)
+                    })
+                },
+                cancel() {
+                    nodeStream.destroy()
+                },
+            })
+
+            return new Response(readableStream, {
                 headers: {
                     'Content-Type': 'image',
+                    'ETag': etag,
+                    'Last-Modified': lastModified,
                     // Not useful when the image is served from the Next.js image optimization API "<Image />" component, but still good for direct access
                     'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
                 },
