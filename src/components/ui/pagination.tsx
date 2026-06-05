@@ -1,34 +1,16 @@
 'use client'
 
-import { useMemo } from 'react'
 import classNames from 'classnames'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import type { Filters } from 'lib/database'
+import { buildClosetUrl, filtersFromParams, getVisiblePages } from 'lib/catalog/query'
+import type { Filters } from 'lib/catalog/query'
 
 interface PaginationProps {
     /** Total number of pages */
     readonly pages: number
     /** Callback to update filters and sync to URL */
     readonly onFiltersChange: (next: Partial<Filters>) => void
-}
-
-/**
- * Builds a URL for a given page number, preserving current filters
- * @param pathname The base pathname for pagination links (e.g. "/")
- * @param params The current URL search params, used to preserve filters in pagination links
- * @param page The target page number for the pagination link
- * @returns A URL string for the pagination link to the given page, with filters preserved
- */
-function buildPageUrl(pathname: string, params: URLSearchParams, page: number): string {
-    const next = new URLSearchParams(params)
-    if (page === 1) {
-        next.delete('page')
-    } else {
-        next.set('page', String(page))
-    }
-    const qs = next.toString()
-    return qs ? `${pathname}?${qs}` : pathname
 }
 
 /**
@@ -39,32 +21,14 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
+    const filters = filtersFromParams(searchParams)
+    const page = filters.page
 
     const hasPrev = page > 1
     const hasNext = page < pages
 
     // Build visible page numbers (always show first, last and 2 neighbours)
-    const visiblePages = useMemo(() => {
-        const pagesList: Array<number | null> = []
-        pagesList.push(1)
-        if (page > 3) {
-            pagesList.push(null) // Ellipsis
-        }
-        for (let p = Math.max(2, page - 1); p <= Math.min(pages - 1, page + 1); p++) {
-            if (!pagesList.includes(p)) {
-                pagesList.push(p)
-            }
-        }
-        if (page < pages - 2) {
-            pagesList.push(null) // Ellipsis
-        }
-        if (!pagesList.includes(pages)) {
-            pagesList.push(pages)
-        }
-        return pagesList
-    }, [page, pages])
+    const visiblePages = getVisiblePages(page, pages)
 
     const arrowCls = (enabled: boolean) =>
         classNames('inline-flex items-center justify-center w-9 h-9 rounded-xl transition-colors', {
@@ -85,7 +49,7 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                 <Link
                     aria-label="Previous page"
                     className={arrowCls(true)}
-                    href={buildPageUrl(pathname, searchParams, page - 1)}
+                    href={buildClosetUrl(pathname, { ...filters, page: page - 1 })}
                     onClick={() => {
                         onFiltersChange({ page: page - 1 })
                     }}
@@ -145,7 +109,7 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                                 'bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-white': p !== page,
                             },
                         )}
-                        href={buildPageUrl(pathname, searchParams, p)}
+                        href={buildClosetUrl(pathname, { ...filters, page: p })}
                         key={p}
                         onClick={() => {
                             onFiltersChange({ page: p })
@@ -161,7 +125,7 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                 <Link
                     aria-label="Next page"
                     className={arrowCls(true)}
-                    href={buildPageUrl(pathname, searchParams, page + 1)}
+                    href={buildClosetUrl(pathname, { ...filters, page: page + 1 })}
                     onClick={() => {
                         onFiltersChange({ page: page + 1 })
                     }}

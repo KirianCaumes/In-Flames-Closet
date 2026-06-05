@@ -5,10 +5,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { DefaultThumbnail } from 'components/item-card'
-import CategoryIcon from 'components/category-icon'
-import albums from 'lib/albums'
-import type { Item } from 'lib/database'
+import { DefaultThumbnail } from 'components/ui/default-thumbnail'
+import { buildImageUrl, createImageStatusUpdater } from 'lib/image/identity'
+import { buildItemDetailUrl } from 'lib/projection/item'
+import { buildFilterUrl } from 'lib/catalog/query'
+import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
+import type { Item } from 'lib/catalog/data'
+import type { ImageStatus } from 'lib/image/identity'
 
 interface ItemDetailProps {
     /** The item to display */
@@ -23,12 +26,8 @@ interface ItemDetailProps {
 export default function ItemDetail({ item }: ItemDetailProps) {
     const router = useRouter()
     const [activeIndex, setActiveIndex] = useState(0)
-    const [statusImages, setStatusImages] = useState<Map<string, 'error' | 'resolved' | undefined>>(new Map())
-    const albumCover = albums[item.link]
-
-    const updateImageStatus = (imageId: string, status: 'error' | 'resolved' | undefined) => {
-        setStatusImages(prev => new Map(prev).set(imageId, status))
-    }
+    const [statusImages, setStatusImages] = useState<Record<string, ImageStatus>>({})
+    const updateImageStatus = createImageStatusUpdater(setStatusImages)
 
     return (
         <div className="min-h-screen">
@@ -97,12 +96,12 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                             {/* Main image */}
                             {item.imagesId.map(
                                 (imageId, i) =>
-                                    statusImages.get(`main-${i}`) !== 'error' && (
+                                    statusImages[`main-${i}`] !== 'error' && (
                                         <Image
                                             alt={item.title}
                                             className={classNames('object-contain text-transparent transition-opacity duration-300', {
-                                                'opacity-0': !statusImages.get(`main-${i}`) || activeIndex !== i,
-                                                'opacity-100': statusImages.get(`main-${i}`) === 'resolved' && activeIndex === i,
+                                                'opacity-0': !statusImages[`main-${i}`] || activeIndex !== i,
+                                                'opacity-100': statusImages[`main-${i}`] === 'resolved' && activeIndex === i,
                                             })}
                                             fill
                                             key={imageId}
@@ -114,7 +113,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                                 updateImageStatus(`main-${i}`, 'resolved')
                                             }}
                                             sizes="(max-width: 1024px) 100vw, 50vw"
-                                            src={`/image/${item.folderId}/${imageId}`}
+                                            src={buildImageUrl({ folderId: item.folderId, imageId })}
                                         />
                                     ),
                             )}
@@ -211,12 +210,12 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                         type="button"
                                     >
                                         <DefaultThumbnail size="small" />
-                                        {statusImages.get(`thumb-${imgId}`) !== 'error' && (
+                                        {statusImages[`thumb-${imgId}`] !== 'error' && (
                                             <Image
                                                 alt={`${item.title} - image ${i + 1}`}
                                                 className={classNames('object-cover text-transparent transition-opacity duration-300', {
-                                                    'opacity-0': !statusImages.get(`thumb-${imgId}`),
-                                                    'opacity-100': statusImages.get(`thumb-${imgId}`) === 'resolved',
+                                                    'opacity-0': !statusImages[`thumb-${imgId}`],
+                                                    'opacity-100': statusImages[`thumb-${imgId}`] === 'resolved',
                                                 })}
                                                 fill
                                                 loading="lazy"
@@ -227,7 +226,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                                     updateImageStatus(`thumb-${imgId}`, 'resolved')
                                                 }}
                                                 sizes="64px"
-                                                src={`/image/${item.folderId}/${imgId}`}
+                                                src={buildImageUrl({ folderId: item.folderId, imageId: imgId })}
                                             />
                                         )}
                                     </button>
@@ -252,8 +251,8 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                     onClick={async () => {
                                         try {
                                             await navigator.share({
-                                                title: item.title,
-                                                url: `/${item.folderId}`,
+                                                title: [item.title, item.category, item.year].filter(Boolean).join(' - '),
+                                                url: buildItemDetailUrl('', item),
                                             })
                                         } catch {
                                             // Dismissed or unsupported - do nothing
@@ -281,39 +280,11 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                         {/* Metadata rows */}
                         <dl className="bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden divide-y divide-stone-800">
                             {[
-                                {
-                                    label: 'Category',
-                                    value: item.category,
-                                    icon: (
-                                        <span className="text-stone-400">
-                                            <CategoryIcon name={item.category} />
-                                        </span>
-                                    ),
-                                    href: `/?categories=${encodeURIComponent(item.category)}`,
-                                },
-                                {
-                                    label: 'Year',
-                                    value: item.year,
-                                    icon: null,
-                                    href: `/?years=${encodeURIComponent(item.year)}`,
-                                },
-                                {
-                                    label: 'Linked to',
-                                    value: item.link,
-                                    icon: albumCover ? (
-                                        <Image
-                                            alt={item.link}
-                                            className="rounded-sm object-cover text-transparent"
-                                            height={16}
-                                            loading="lazy"
-                                            src={albumCover}
-                                            width={16}
-                                        />
-                                    ) : null,
-                                    href: `/?links=${encodeURIComponent(item.link)}`,
-                                },
-                                { label: 'Official', value: item.official, icon: null, href: null },
-                                { label: 'Source', value: item.source, icon: null, href: null },
+                                { label: 'Category', value: item.category, href: buildFilterUrl('categories', item.category) },
+                                { label: 'Year', value: item.year, href: buildFilterUrl('years', item.year) },
+                                { label: 'Linked to', value: item.link, href: buildFilterUrl('links', item.link) },
+                                { label: 'Official', value: item.official, href: null },
+                                { label: 'Source', value: item.source, href: null },
                             ]
                                 .filter(row => row.value)
                                 .map(row => (
@@ -325,7 +296,10 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                             {row.label}
                                         </dt>
                                         <dd className="flex items-center gap-2 text-sm text-stone-300 min-w-0">
-                                            {row.icon}
+                                            {row.label === 'Category' && (
+                                                <span className="text-stone-400">{getCategoryDisplay(row.value).icon}</span>
+                                            )}
+                                            {row.label === 'Linked to' && getAlbumDisplay(row.value).icon}
                                             {row.href ? (
                                                 <Link
                                                     className="hover:text-brand-400 transition-colors truncate"

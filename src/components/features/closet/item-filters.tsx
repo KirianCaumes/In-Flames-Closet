@@ -1,14 +1,12 @@
 'use client'
 
 import { useCallback, useRef, useState, useEffect } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
 import { useDebounce } from 'react-use'
-import CategoryIcon from 'components/category-icon'
-import albums from 'lib/albums'
-import { DEFAULT_FILTERS, DEFAULT_LIMIT } from 'components/closet-page'
-import type { Filters, Params } from 'lib/database'
+import { buildClosetUrl, DEFAULT_FILTERS, DEFAULT_LIMIT, hasActiveClosetFilters, toggleFilterValue, type Filters } from 'lib/catalog/query'
+import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
+import type { Params } from 'lib/catalog/data'
 
 interface ItemFiltersProps {
     /** Current filter values */
@@ -38,35 +36,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
 
     const [filterTypeOpen, setFilterTypeOpen] = useState<null | 'links' | 'categories'>('links')
 
-    const buildUrl = useCallback(
-        (partial: Record<string, string | Array<string> | number>): string => {
-            const newParams = new URLSearchParams()
-            const merged = { ...filters, ...partial }
-
-            if (merged.page !== 1) {
-                newParams.set('page', merged.page.toString())
-            }
-            if (merged.title) {
-                newParams.set('title', merged.title)
-            }
-            if (merged.sort !== 'new') {
-                newParams.set('sort', merged.sort)
-            }
-            merged.links.forEach(l => {
-                newParams.append('links', l)
-            })
-            merged.years.forEach(y => {
-                newParams.append('years', y)
-            })
-            merged.categories.forEach(c => {
-                newParams.append('categories', c)
-            })
-
-            const qs = newParams.toString()
-            return qs ? `/?${qs}` : '/'
-        },
-        [filters],
-    )
+    const buildUrl = useCallback((partial: Partial<Filters>): string => buildClosetUrl('/', { ...filters, ...partial }), [filters])
 
     const reset = useCallback(() => {
         setDebouncedTitle('')
@@ -93,18 +63,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
         }
     }, [filters.title])
 
-    const isFiltered = Object.entries(filters).some(([key, value]) => {
-        if (key === 'sort') {
-            return false
-        }
-        if (key === 'page') {
-            return value !== 1
-        }
-        if (Array.isArray(value)) {
-            return value.length > 0
-        }
-        return value !== ''
-    })
+    const isFiltered = hasActiveClosetFilters(filters)
 
     return (
         <aside className="bg-stone-900 border border-stone-800 rounded-2xl p-4">
@@ -279,9 +238,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                             onMouseEnter={() => {
                                                 router.prefetch(
                                                     buildUrl({
-                                                        links: filters.links.includes(link)
-                                                            ? filters.links.filter(x => x !== link)
-                                                            : [...filters.links, link],
+                                                        links: toggleFilterValue(filters.links, link),
                                                         page: 1,
                                                     }),
                                                 )
@@ -290,12 +247,10 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                             <input
                                                 checked={filters.links.includes(link)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer min-w-4"
-                                                onChange={({ target }) => {
+                                                onChange={() => {
                                                     onFiltersChange(
                                                         {
-                                                            links: target.checked
-                                                                ? [...filters.links, link]
-                                                                : filters.links.filter(x => x !== link),
+                                                            links: toggleFilterValue(filters.links, link),
                                                             page: 1,
                                                         },
                                                         'push',
@@ -303,35 +258,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 }}
                                                 type="checkbox"
                                             />
-                                            {albums[link] ? (
-                                                <Image
-                                                    alt={link}
-                                                    className="rounded-sm object-cover shrink-0"
-                                                    height={16}
-                                                    loading="lazy"
-                                                    src={albums[link]}
-                                                    width={16}
-                                                />
-                                            ) : (
-                                                <svg
-                                                    className="w-4 h-4 text-stone-600"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <circle
-                                                        cx="12"
-                                                        cy="12"
-                                                        r="9"
-                                                        strokeWidth={2}
-                                                    />
-                                                    <path
-                                                        d="M12 3c-3 4-3 14 0 18M12 3c3 4 3 14 0 18M3 12h18"
-                                                        strokeLinecap="round"
-                                                        strokeWidth={2}
-                                                    />
-                                                </svg>
-                                            )}
+                                            {getAlbumDisplay(link).icon}
                                             <span className="text-sm transition-colors truncate text-stone-400 group-hover:text-stone-200">
                                                 {link}
                                             </span>
@@ -381,9 +308,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                             onMouseEnter={() => {
                                                 router.prefetch(
                                                     buildUrl({
-                                                        categories: filters.categories.includes(category)
-                                                            ? filters.categories.filter(x => x !== category)
-                                                            : [...filters.categories, category],
+                                                        categories: toggleFilterValue(filters.categories, category),
                                                         page: 1,
                                                     }),
                                                 )
@@ -392,12 +317,10 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                             <input
                                                 checked={filters.categories.includes(category)}
                                                 className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer"
-                                                onChange={({ target }) => {
+                                                onChange={() => {
                                                     onFiltersChange(
                                                         {
-                                                            categories: target.checked
-                                                                ? [...filters.categories, category]
-                                                                : filters.categories.filter(x => x !== category),
+                                                            categories: toggleFilterValue(filters.categories, category),
                                                             page: 1,
                                                         },
                                                         'push',
@@ -406,7 +329,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 type="checkbox"
                                             />
                                             <span className="transition-colors flex items-center text-stone-400 group-hover:text-stone-200">
-                                                <CategoryIcon name={category} />
+                                                {getCategoryDisplay(category).icon}
                                             </span>
                                             <span className="text-sm transition-colors text-stone-400 group-hover:text-stone-200">
                                                 {category}

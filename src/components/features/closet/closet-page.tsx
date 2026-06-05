@@ -6,64 +6,13 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
 import classNames from 'classnames'
-import ItemCard from 'components/item-card'
-import ItemFilters from 'components/item-filters'
-import Pagination from 'components/pagination'
+import ItemCard from 'components/features/closet/item-card'
+import ItemFilters from 'components/features/closet/item-filters'
+import Pagination from 'components/ui/pagination'
+import { applyClosetQuery, areFiltersEqual, buildClosetUrl, DEFAULT_FILTERS, filtersFromParams, type Filters } from 'lib/catalog/query'
 // eslint-disable-next-line no-restricted-imports
-import IconSvg from '../../public/favicon.svg'
-import type { Filters, Item, Params } from 'lib/database'
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const DEFAULT_LIMIT = 60
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const DEFAULT_FILTERS: Filters = { page: 1, links: [], years: [], categories: [], sort: 'new', title: '' }
-
-/**
- * Parses URL search parameters into a Filters object.
- * @param params The URLSearchParams from the current URL
- * @returns Filters object representing the current filter state
- */
-function filtersFromParams(params: URLSearchParams): Filters {
-    const page = Number.parseInt(params.get('page') ?? '', 10)
-    return {
-        page: Number.isNaN(page) ? 1 : page,
-        links: params.getAll('links'),
-        years: params.getAll('years'),
-        categories: params.getAll('categories'),
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        sort: (params.get('sort') as Filters['sort']) ?? 'new',
-        title: params.get('title') ?? '',
-    }
-}
-
-/**
- * Converts a Filters object into a URL query string.
- * @param filters The current filter state
- * @returns A query string representing the filters (without leading `?`)
- */
-function paramsFromFilters(filters: Filters): string {
-    const params = new URLSearchParams()
-    if (filters.page !== 1) {
-        params.set('page', filters.page.toString())
-    }
-    if (filters.title) {
-        params.set('title', filters.title)
-    }
-    if (filters.sort !== 'new') {
-        params.set('sort', filters.sort)
-    }
-    filters.links.forEach(l => {
-        params.append('links', l)
-    })
-    filters.years.forEach(y => {
-        params.append('years', y)
-    })
-    filters.categories.forEach(c => {
-        params.append('categories', c)
-    })
-    return params.toString()
-}
+import IconSvg from '../../../../public/favicon.svg'
+import type { Item, Params } from 'lib/catalog/data'
 
 interface ClosetPageProps {
     /** All items (unfiltered) */
@@ -94,47 +43,14 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
         setFilters(prev => {
             const newFilters = filtersFromParams(searchParams)
             // Only update if filters actually changed
-            if (
-                prev.page === newFilters.page &&
-                prev.title === newFilters.title &&
-                prev.sort === newFilters.sort &&
-                prev.links.length === newFilters.links.length &&
-                prev.links.every((l, i) => l === newFilters.links[i]) &&
-                prev.years.length === newFilters.years.length &&
-                prev.years.every((y, i) => y === newFilters.years[i]) &&
-                prev.categories.length === newFilters.categories.length &&
-                prev.categories.every((c, i) => c === newFilters.categories[i])
-            ) {
+            if (areFiltersEqual(prev, newFilters)) {
                 return prev
             }
             return newFilters
         })
     }, [searchParams])
 
-    const { pagedItems, total, pages } = useMemo(() => {
-        const { links, categories, years, sort, title, page } = deferredFilters
-
-        let filtered = items.filter(
-            item =>
-                (links.length === 0 || links.includes(item.link)) &&
-                (categories.length === 0 || categories.includes(item.category)) &&
-                (years.length === 0 || years.includes(item.year)) &&
-                (!title || item.title.toLowerCase().includes(title.toLowerCase())),
-        )
-
-        if (sort === 'old') {
-            filtered = [...filtered].reverse()
-        }
-
-        const filteredTotal = filtered.length
-        const filteredPages = Math.ceil(filteredTotal / DEFAULT_LIMIT)
-
-        return {
-            pagedItems: filtered.slice(DEFAULT_LIMIT * (page - 1), DEFAULT_LIMIT * page),
-            total: filteredTotal,
-            pages: filteredPages,
-        }
-    }, [items, deferredFilters])
+    const { pagedItems, total, pages } = useMemo(() => applyClosetQuery(items, deferredFilters), [items, deferredFilters])
 
     /**
      * Updates filters state and syncs the new filter values to the URL.
@@ -142,10 +58,10 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
      * @param type - Whether to push a new history entry or replace the current one (default: push)
      */
     function handleFiltersChange(next: Partial<Filters>, type: 'push' | 'replace' | null = 'push') {
-        setFilters(prev => ({ ...prev, ...next }))
-        const qs = paramsFromFilters({ ...filters, ...next })
+        const updatedFilters = { ...filters, ...next }
+        setFilters(updatedFilters)
         if (type) {
-            router[type](qs ? `${pathname}?${qs}` : pathname, { scroll: true })
+            router[type](buildClosetUrl(pathname, updatedFilters), { scroll: true })
         }
     }
 

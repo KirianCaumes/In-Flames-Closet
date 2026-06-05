@@ -1,81 +1,25 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 'use client'
 
 import Script from 'next/script'
 import { useSyncExternalStore } from 'react'
+import {
+    acceptAnalyticsConsent,
+    getAnalyticsConsent,
+    getAnalyticsConsentServerSnapshot,
+    refuseAnalyticsConsent,
+    subscribeToAnalyticsConsent,
+} from 'lib/privacy/consent'
 
-import Cookie from 'lib/cookie'
-
-const CONSENT_COOKIE = 'accept_cookies'
-const GA_COOKIE_KEYS = ['_ga', '_gat', '_gid'] as const
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID
-
-/**
- * Read the consent cookie on the client. Returns null when the cookie is absent.
- * Returns null on the server too - banner stays hidden during SSR to avoid hydration mismatch.
- * @returns The stored consent as a boolean, or null if not yet set
- */
-function getConsentSnapshot(): boolean | null {
-    const value = Cookie.get(CONSENT_COOKIE)
-    if (value === null) {
-        return null
-    }
-    return value === 'true'
-}
-
-/**
- * Set of listeners to notify when the consent cookie value changes.
- */
-const consentListeners = new Set<() => void>()
-
-/**
- * Subscribe to changes in the consent cookie. The provided callback will be called whenever the cookie value is updated via the onAccept or onRefuse handlers.
- * @param callback - Function to call when consent status changes, prompting re-check of cookie value
- * @returns Unsubscribe function to remove the listener when the component unmounts
- */
-function subscribe(callback: () => void): () => void {
-    consentListeners.add(callback)
-    return () => consentListeners.delete(callback)
-}
-
-/**
- * Notify all subscribed listeners of a change in consent status, prompting them to re-check the cookie value.
- */
-function notifyConsentChange(): void {
-    consentListeners.forEach(cb => {
-        cb()
-    })
-}
-
-/**
- * Server snapshot for useSyncExternalStore - always null to suppress banner during SSR.
- * @returns null
- */
-function getConsentServerSnapshot() {
-    return true
-}
 
 /**
  * Component that displays a GDPR consent banner for cookie usage, specifically for Google Analytics.
  * @returns JSX element representing the GDPR consent banner and conditional GA scripts
  */
 export default function GdprBanner() {
-    const consent = useSyncExternalStore(subscribe, getConsentSnapshot, getConsentServerSnapshot)
-    const isVisible = consent === null
-    const isGaEnabled = consent === true
-
-    const onAccept = () => {
-        Cookie.set(CONSENT_COOKIE, 'true', 99999)
-        notifyConsentChange()
-    }
-
-    const onRefuse = () => {
-        Cookie.set(CONSENT_COOKIE, 'false', 99999)
-        GA_COOKIE_KEYS.forEach(key => {
-            Cookie.remove(key)
-        })
-        notifyConsentChange()
-    }
+    const hasConsent = useSyncExternalStore(subscribeToAnalyticsConsent, getAnalyticsConsent, getAnalyticsConsentServerSnapshot)
+    const isVisible = hasConsent === null
+    const isGaEnabled = hasConsent === true
 
     return (
         <>
@@ -112,7 +56,7 @@ export default function GdprBanner() {
                             <button
                                 // eslint-disable-next-line max-len
                                 className="flex items-center gap-2 px-4 py-2 rounded bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium transition-colors cursor-pointer"
-                                onClick={onAccept}
+                                onClick={acceptAnalyticsConsent}
                                 type="button"
                             >
                                 <CookieIcon />
@@ -121,7 +65,7 @@ export default function GdprBanner() {
                             <button
                                 // eslint-disable-next-line max-len
                                 className="flex items-center gap-2 px-4 py-2 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-sm font-medium transition-colors cursor-pointer"
-                                onClick={onRefuse}
+                                onClick={refuseAnalyticsConsent}
                                 type="button"
                             >
                                 <CloseIcon />

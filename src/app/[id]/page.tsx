@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
-import database from 'lib/database'
-import ItemDetail from 'components/item-detail'
+import ItemDetail from 'components/features/item-detail/item-detail'
+import { fetchClosetItems } from 'lib/catalog/data'
+import { projectItemMetadata } from 'lib/projection/item'
 import type { Metadata } from 'next'
 
 /**
@@ -18,30 +19,12 @@ export async function generateMetadata({
     }>
 }): Promise<Metadata> {
     const { id } = await params
-    const item = await database.getById(id)
+    const item = await findClosetItem(id)
     if (!item) {
         return { title: 'Item not found' }
     }
 
-    const description = [item.title, item.category, item.year].filter(Boolean).join(' - ')
-    const imageUrl = `${process.env.SITE_URL ?? ''}/image/${item.folderId}/${item.imagesId[0]}`
-
-    return {
-        title: item.title,
-        description,
-        openGraph: {
-            title: `${item.title} - In Flames Closet`,
-            description,
-            images: [{ url: imageUrl, alt: item.title }],
-            type: 'website',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: `${item.title} - In Flames Closet`,
-            description,
-            images: [imageUrl],
-        },
-    }
+    return projectItemMetadata(item, process.env.SITE_URL ?? '')
 }
 
 /**
@@ -58,11 +41,21 @@ export default async function IdPage({
     }>
 }) {
     const { id } = await params
-    const item = await database.getById(id)
+    const item = await findClosetItem(id)
 
     if (!item) {
         notFound()
     }
 
     return <ItemDetail item={item} />
+}
+
+/**
+ * Finds one closet item by folder ID.
+ * @param id Folder ID.
+ * @returns Matching closet item or null.
+ */
+async function findClosetItem(id: string) {
+    const items = await fetchClosetItems()
+    return items.find(item => item.folderId === id) ?? null
 }

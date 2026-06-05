@@ -1,4 +1,5 @@
-import database from 'lib/database'
+import { fetchClosetItems } from 'lib/catalog/data'
+import { buildItemDetailUrl } from 'lib/projection/item'
 import type { MetadataRoute } from 'next'
 
 /**
@@ -9,7 +10,7 @@ import type { MetadataRoute } from 'next'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = process.env.SITE_URL ?? ''
 
-    const items = await database.getItems()
+    const items = await fetchClosetItems()
 
     return [
         {
@@ -18,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 1,
         },
         ...items.map(item => ({
-            url: `${base}/${item.folderId}`,
+            url: buildItemDetailUrl(base, item),
             changeFrequency: 'monthly' as const,
             priority: 0.8,
         })),
