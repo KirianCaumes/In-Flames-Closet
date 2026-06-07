@@ -14,7 +14,7 @@ RUN chown usr:usr /app
 
 COPY --chown=usr:usr . .
 
-RUN npm run build
+RUN npm run build && npm prune --omit=dev
 
 USER usr
 
