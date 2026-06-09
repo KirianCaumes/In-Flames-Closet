@@ -132,7 +132,7 @@ function normalizeItem(row: RawItemRow): Item {
             .filter(Boolean),
         title: row.Title ?? '',
         category: row.Category ?? '',
-        link: row.Link ?? '',
+        link: row['Linked to'] ?? '',
         year: row.Year ?? '',
         source: row.Source ?? '',
         official: row.Official ?? '',

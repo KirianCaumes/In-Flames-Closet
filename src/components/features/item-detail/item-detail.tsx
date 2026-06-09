@@ -112,7 +112,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                             onLoad={() => {
                                                 updateImageStatus(`main-${i}`, 'resolved')
                                             }}
-                                            sizes="(max-width: 1024px) 100vw, 50vw"
+                                            sizes="(max-width: 1023px) 100vw, (max-width: 1151px) 50vw, 550px"
                                             src={buildImageUrl({ folderId: item.folderId, imageId })}
                                         />
                                     ),

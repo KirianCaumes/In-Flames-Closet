@@ -8,6 +8,7 @@ import { DefaultThumbnail } from 'components/ui/default-thumbnail'
 import { buildImageUrl, createImageStatusUpdater } from 'lib/image/identity'
 import { buildItemDetailUrl } from 'lib/projection/item'
 import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
+import type { ComponentProps } from 'react'
 import type { Item } from 'lib/catalog/data'
 import type { ImageStatus } from 'lib/image/identity'
 
@@ -17,9 +18,12 @@ import type { ImageStatus } from 'lib/image/identity'
  */
 export default function ItemCard({
     item,
+    imageLoading = 'lazy',
 }: {
     /** The item to be displayed */
     readonly item: Item
+    /** Image loading strategy, defaults to 'lazy' */
+    readonly imageLoading?: ComponentProps<typeof Image>['loading']
 }) {
     const [isHovered, setIsHovered] = useState(false)
     const [statusImages, setStatusImages] = useState<Record<string, ImageStatus>>({})
@@ -55,15 +59,17 @@ export default function ItemCard({
                                         statusImages[item.imagesId[0]] === 'resolved' &&
                                         !(isHovered && item.imagesId[1] && statusImages[item.imagesId[1]] !== 'error'),
                                 })}
+                                fetchPriority={imageLoading === 'eager' ? 'high' : 'auto'}
                                 fill
-                                loading="lazy"
+                                loading={imageLoading}
                                 onError={() => {
                                     updateImageStatus(item.imagesId[0], 'error')
                                 }}
                                 onLoad={() => {
                                     updateImageStatus(item.imagesId[0], 'resolved')
                                 }}
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                // eslint-disable-next-line max-len
+                                sizes="(max-width: 639px) 100vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) calc(33vw - 120px), 220px"
                                 src={buildImageUrl({ folderId: item.folderId, imageId: item.imagesId[0] })}
                             />
                             {item.imagesId[1] && (
@@ -81,7 +87,8 @@ export default function ItemCard({
                                     onLoad={() => {
                                         updateImageStatus(item.imagesId[1], 'resolved')
                                     }}
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    // eslint-disable-next-line max-len
+                                    sizes="(max-width: 639px) 100vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) calc(33vw - 120px), 220px"
                                     src={buildImageUrl({ folderId: item.folderId, imageId: item.imagesId[1] })}
                                 />
                             )}

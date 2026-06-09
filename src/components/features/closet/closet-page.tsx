@@ -149,8 +149,9 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                         },
                                     )}
                                 >
-                                    {pagedItems.map(item => (
+                                    {pagedItems.map((item, i) => (
                                         <ItemCard
+                                            imageLoading={i < 4 ? 'eager' : 'lazy'}
                                             item={item}
                                             key={item.folderId}
                                         />
