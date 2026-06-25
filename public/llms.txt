@@ -1,0 +1,26 @@
+# In Flames Closet - Archive of the band's artworks
+
+> An archive of In Flames artworks throughout the years: clothes, goodies, and more. Explore the
+> history of the band through their official merchandise and products, from their Gothenburg roots
+> in the early 1990s all the way to today.
+
+The closet is a searchable web app. Visitors can filter artworks by title, category (t-shirts,
+hoodies, and other goodies), linked album/release, and year, then sort chronologically. It is a
+non-commercial fan project; all artworks and trademarks belong to their respective owners.
+
+## Key facts
+
+- Artist: In Flames (melodic death metal, formed 1990 in Gothenburg, Sweden)
+- Catalogued: official clothing, goodies, and artworks across the decades
+- Data per item: title, category, linked album/release, year, official status, and source
+- Curated by: A Jester's Collection (https://jesterscollection.kiriancaumes.fr/)
+
+## Links
+
+- Closet homepage: https://in-flames-closet.kiriancaumes.fr/
+- Curator's collection: https://jesterscollection.kiriancaumes.fr/
+- Source code: https://github.com/KirianCaumes/In-Flames-Closet
+
+## Contributing
+
+Corrections and new item suggestions can be sent to ajesterscollection@gmail.com.

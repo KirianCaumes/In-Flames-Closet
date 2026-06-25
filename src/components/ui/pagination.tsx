@@ -32,8 +32,8 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
 
     const arrowCls = (enabled: boolean) =>
         classNames('inline-flex items-center justify-center w-9 h-9 rounded-xl transition-colors', {
-            'bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-white': enabled,
-            'bg-stone-800/50 text-stone-600 cursor-not-allowed pointer-events-none': !enabled,
+            'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white': enabled,
+            'bg-gray-800/50 text-gray-600 cursor-not-allowed pointer-events-none': !enabled,
         })
 
     if (pages <= 1) {
@@ -92,7 +92,7 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
             {visiblePages.map((p, i) =>
                 p === null ? (
                     <span
-                        className="text-stone-500 px-1"
+                        className="text-gray-500 px-1"
                         // eslint-disable-next-line react/no-array-index-key
                         key={`ellipsis-${i}`}
                     >
@@ -106,7 +106,7 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                             'inline-flex items-center justify-center min-w-9 h-9 px-2 rounded-xl text-sm font-medium transition-colors',
                             {
                                 'bg-brand-500 text-white': p === page,
-                                'bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-white': p !== page,
+                                'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white': p !== page,
                             },
                         )}
                         href={buildClosetUrl(pathname, { ...filters, page: p })}

@@ -16,9 +16,9 @@ export function DefaultThumbnail({
     readonly size?: 'normal' | 'small'
 }) {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-stone-900 to-stone-800">
+        <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-gray-900 to-gray-800">
             <svg
-                className={classNames('w-8 h-8 text-stone-700', {
+                className={classNames('w-8 h-8 text-gray-700', {
                     'scale-[1]': size === 'normal',
                     'scale-[0.5]': size === 'small',
                 })}

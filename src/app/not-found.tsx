@@ -8,10 +8,10 @@ export default function NotFound() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
             <div className="mb-6">
-                <span className="text-8xl font-black text-brand-500 tabular-nums select-none">404</span>
+                <span className="text-8xl font-display font-black text-brand-500 tabular-nums select-none">404</span>
             </div>
-            <h1 className="text-2xl font-bold text-stone-100 mb-3">Page not found</h1>
-            <p className="text-stone-400 mb-8 max-w-sm leading-relaxed">
+            <h1 className="text-2xl font-display font-bold text-gray-100 mb-3">Page not found</h1>
+            <p className="text-gray-400 mb-8 max-w-sm leading-relaxed">
                 The item or page you&apos;re looking for doesn&apos;t exist or may have been removed.
             </p>
             <Link

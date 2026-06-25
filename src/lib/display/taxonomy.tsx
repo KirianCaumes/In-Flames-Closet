@@ -48,7 +48,7 @@ export function getAlbumDisplay(name: string): AlbumDisplay {
             />
         ) : (
             <svg
-                className="w-4 h-4 text-stone-600"
+                className="w-4 h-4 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import ItemDetail from 'components/features/item-detail/item-detail'
+import { ItemStructuredData } from 'components/structured-data'
 import { fetchClosetItems } from 'lib/catalog/data'
 import { projectItemMetadata } from 'lib/projection/item'
 import type { Metadata } from 'next'
@@ -47,7 +48,12 @@ export default async function IdPage({
         notFound()
     }
 
-    return <ItemDetail item={item} />
+    return (
+        <>
+            <ItemStructuredData item={item} />
+            <ItemDetail item={item} />
+        </>
+    )
 }
 
 /**

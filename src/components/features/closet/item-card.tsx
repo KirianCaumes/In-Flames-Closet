@@ -8,7 +8,6 @@ import { DefaultThumbnail } from 'components/ui/default-thumbnail'
 import { buildImageUrl, createImageStatusUpdater } from 'lib/image/identity'
 import { buildItemDetailUrl } from 'lib/projection/item'
 import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
-import type { ComponentProps } from 'react'
 import type { Item } from 'lib/catalog/data'
 import type { ImageStatus } from 'lib/image/identity'
 
@@ -18,12 +17,12 @@ import type { ImageStatus } from 'lib/image/identity'
  */
 export default function ItemCard({
     item,
-    imageLoading = 'lazy',
+    priority = false,
 }: {
     /** The item to be displayed */
     readonly item: Item
-    /** Image loading strategy, defaults to 'lazy' */
-    readonly imageLoading?: ComponentProps<typeof Image>['loading']
+    /** Whether to eagerly load and preload the image (set only for the first/LCP card) */
+    readonly priority?: boolean
 }) {
     const [isHovered, setIsHovered] = useState(false)
     const [statusImages, setStatusImages] = useState<Record<string, ImageStatus>>({})
@@ -32,13 +31,13 @@ export default function ItemCard({
     const categoryDisplay = getCategoryDisplay(item.category)
 
     return (
-        <article className="bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden flex flex-col transition-colors duration-200">
+        <article className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col transition-colors duration-200">
             <Link
                 href={buildItemDetailUrl('', item)}
                 title={item.title}
             >
                 <div
-                    className="relative h-52 overflow-hidden bg-stone-900 border-b border-stone-800"
+                    className="relative h-52 overflow-hidden bg-gray-900 border-b border-gray-800"
                     onMouseEnter={() => {
                         setIsHovered(true)
                     }}
@@ -51,23 +50,25 @@ export default function ItemCard({
                         <>
                             <Image
                                 alt={item.title}
-                                className={classNames('absolute inset-0 object-contain transition-opacity duration-300 text-transparent', {
-                                    'opacity-0':
-                                        !statusImages[item.imagesId[0]] ||
-                                        (isHovered && item.imagesId[1] && statusImages[item.imagesId[1]] !== 'error'),
-                                    'opacity-100':
-                                        statusImages[item.imagesId[0]] === 'resolved' &&
-                                        !(isHovered && item.imagesId[1] && statusImages[item.imagesId[1]] !== 'error'),
-                                })}
-                                fetchPriority={imageLoading === 'eager' ? 'high' : 'auto'}
+                                className={classNames(
+                                    'thumb-image absolute inset-0 object-contain transition-opacity duration-300 text-transparent',
+                                    {
+                                        'opacity-0':
+                                            !statusImages[item.imagesId[0]] ||
+                                            (isHovered && item.imagesId[1] && statusImages[item.imagesId[1]] !== 'error'),
+                                        'opacity-100':
+                                            statusImages[item.imagesId[0]] === 'resolved' &&
+                                            !(isHovered && item.imagesId[1] && statusImages[item.imagesId[1]] !== 'error'),
+                                    },
+                                )}
                                 fill
-                                loading={imageLoading}
                                 onError={() => {
                                     updateImageStatus(item.imagesId[0], 'error')
                                 }}
                                 onLoad={() => {
                                     updateImageStatus(item.imagesId[0], 'resolved')
                                 }}
+                                priority={priority}
                                 // eslint-disable-next-line max-len
                                 sizes="(max-width: 639px) 100vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) calc(33vw - 120px), 220px"
                                 src={buildImageUrl({ folderId: item.folderId, imageId: item.imagesId[0] })}
@@ -99,20 +100,22 @@ export default function ItemCard({
 
             {/* Content */}
             <div className="p-3 flex-1">
-                <Link
-                    className="text-sm font-semibold text-stone-100 hover:text-brand-400 transition-colors leading-snug line-clamp-2"
-                    href={buildItemDetailUrl('', item)}
-                    title={item.title}
-                >
-                    {item.title}
-                </Link>
+                <h3>
+                    <Link
+                        className="text-sm font-semibold text-gray-100 hover:text-brand-400 transition-colors leading-snug line-clamp-2"
+                        href={buildItemDetailUrl('', item)}
+                        title={item.title}
+                    >
+                        {item.title}
+                    </Link>
+                </h3>
             </div>
 
             {/* Footer */}
-            <div className="px-3 py-2 border-t border-stone-800 flex items-center gap-3 justify-between">
+            <div className="px-3 py-2 border-t border-gray-800 flex items-center gap-3 justify-between">
                 {/* Category */}
                 <span
-                    className="flex items-center gap-1 text-xs text-stone-400"
+                    className="flex items-center gap-1 text-xs text-gray-400"
                     title={item.category}
                 >
                     {categoryDisplay.icon}
@@ -121,7 +124,7 @@ export default function ItemCard({
 
                 {/* Album link */}
                 <span
-                    className="flex items-center gap-1 text-xs text-stone-400"
+                    className="flex items-center gap-1 text-xs text-gray-400"
                     title={item.link}
                 >
                     {albumDisplay.icon}

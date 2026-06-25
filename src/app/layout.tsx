@@ -1,11 +1,14 @@
-import { Inter } from 'next/font/google'
+// eslint-disable-next-line camelcase
+import { Oswald, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
 import GdprBanner from 'components/layout/gdpr-banner'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 // eslint-disable-next-line no-restricted-imports
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const plexSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-plex-sans', display: 'swap' })
+const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-mono', display: 'swap' })
+const oswald = Oswald({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-oswald', display: 'swap' })
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
@@ -20,9 +23,12 @@ export const metadata: Metadata = {
     keywords: ['In Flames', 'closet', 'merchandise', 'clothes', 'goodies', 'artwork', 'band', 'metal'],
     authors: [{ name: "A Jester's Collection", url: 'https://jesterscollection.kiriancaumes.fr' }],
     creator: "A Jester's Collection",
+    alternates: { canonical: '/' },
     robots: { index: false, follow: false },
     openGraph: {
         type: 'website',
+        siteName: 'In Flames Closet',
+        locale: 'en_US',
         title: "In Flames Closet - Archive of the band's artworks",
         description:
             // eslint-disable-next-line max-len
@@ -57,17 +63,23 @@ export default function RootLayout({
             lang="en"
             suppressHydrationWarning
         >
-            <body className={`${inter.className} bg-stone-950 text-stone-100 min-h-screen`}>
+            <body
+                className={`${plexSans.variable} ${plexMono.variable} ${oswald.variable} font-sans bg-gray-950 text-gray-100 min-h-screen`}
+            >
+                {/* Thumbnails fade in via an onLoad handler; with JS disabled that never fires, so reveal them here. */}
+                <noscript>
+                    <style>{`.thumb-image{opacity:1 !important}`}</style>
+                </noscript>
                 {children}
 
                 {/* ── Footer ─────────────────────────────────────────────── */}
-                <footer className="border-t border-stone-800/50 mt-12 py-10">
+                <footer className="border-t border-gray-800/50 mt-12 py-10">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center gap-4">
-                        <p className="text-stone-500 text-xs text-center">
+                        <p className="text-gray-500 text-xs text-center">
                             Non-commercial fan archive. All recordings and trademarks belong to their respective owners.
                         </p>
                         <a
-                            className="text-xs text-brand-400 hover:text-brand-400 transition-colors"
+                            className="text-xs text-brand-400 hover:text-brand-300 transition-colors"
                             href="https://jesterscollection.kiriancaumes.fr"
                             rel="noopener noreferrer"
                             target="_blank"

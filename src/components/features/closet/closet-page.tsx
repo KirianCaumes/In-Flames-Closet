@@ -19,8 +19,6 @@ interface ClosetPageProps {
     readonly items: Array<Item>
     /** All available filter options */
     readonly params: Params
-    /** Detected device type for responsive rendering */
-    readonly device: 'mobile' | 'desktop'
 }
 
 /**
@@ -28,7 +26,7 @@ interface ClosetPageProps {
  * Reads URL search params, applies filters and pagination client-side.
  * @returns The rendered closet page with header, filters, items grid, pagination and footer
  */
-export default function ClosetPage({ items, params, device }: ClosetPageProps) {
+export default function ClosetPage({ items, params }: ClosetPageProps) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -68,7 +66,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
     return (
         <>
             {/* ── Sticky header ──────────────────────────────────────── */}
-            <header className="bg-stone-900/80 backdrop-blur-sm border-b border-stone-800 sticky top-0 z-50">
+            <header className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <Link href="/">
@@ -82,26 +80,30 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                             />
                         </Link>
                         <div className="w-px h-8 bg-gradient-to-b from-brand-500 to-brand-600 hidden sm:block" />
-                        <div>
-                            <h1 className="text-xl sm:text-2xl font-bold tracking-widest uppercase text-brand-500">In Flames</h1>
-                            <p className="text-stone-400 text-xs sm:text-sm tracking-wide">Archive of the band's artworks</p>
-                        </div>
+                        <h1 className="leading-tight">
+                            <span className="block text-xl sm:text-2xl font-display font-bold tracking-wide uppercase text-brand-500">
+                                In Flames
+                            </span>
+                            <span className="block text-gray-400 text-xs sm:text-sm tracking-wide font-normal">
+                                Archive of the band's artworks
+                            </span>
+                        </h1>
                     </div>
                     <div className="text-right shrink-0">
-                        <div className="text-2xl font-bold text-brand-500">{items.length}</div>
-                        <div className="text-xs text-stone-400">items archived</div>
+                        <div className="text-2xl font-display font-bold text-brand-500 tabular-nums">{items.length}</div>
+                        <div className="text-xs text-gray-400">items archived</div>
                     </div>
                 </div>
             </header>
 
             {/* ── Main content ───────────────────────────────────────── */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+                <h2 className="sr-only">Browse the In Flames merch &amp; artwork archive</h2>
                 <div className="flex flex-col lg:flex-row gap-6">
                     {/* Sidebar filters */}
                     <div className="w-full lg:w-64 xl:w-72 shrink-0">
                         <div className="sticky top-24">
                             <ItemFilters
-                                defaultOpen={device === 'desktop'}
                                 filters={filters}
                                 onFiltersChange={handleFiltersChange}
                                 params={params}
@@ -115,7 +117,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                         {pagedItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
                                 <svg
-                                    className="w-12 h-12 text-stone-700"
+                                    className="w-12 h-12 text-gray-700"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -127,7 +129,7 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                         strokeWidth={1.5}
                                     />
                                 </svg>
-                                <p className="text-stone-400 font-medium">No items match your filters</p>
+                                <p className="text-gray-400 font-medium">No items match your filters</p>
                                 <button
                                     className="text-sm text-brand-500 hover:text-brand-400 underline underline-offset-2 transition-colors cursor-pointer"
                                     onClick={() => {
@@ -151,9 +153,9 @@ export default function ClosetPage({ items, params, device }: ClosetPageProps) {
                                 >
                                     {pagedItems.map((item, i) => (
                                         <ItemCard
-                                            imageLoading={i < 4 ? 'eager' : 'lazy'}
                                             item={item}
                                             key={item.folderId}
+                                            priority={i === 0}
                                         />
                                     ))}
                                 </div>

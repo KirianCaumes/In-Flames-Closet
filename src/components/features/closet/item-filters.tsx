@@ -15,8 +15,6 @@ interface ItemFiltersProps {
     readonly params: Params
     /** Total number of matching results */
     readonly total: number
-    /** Whether the filter panel is open by default (server-detected from User-Agent) */
-    readonly defaultOpen: boolean
     /** Callback to update filters and sync to URL */
     readonly onFiltersChange: (next: Partial<Filters>, type: 'push' | 'replace' | null) => void
 }
@@ -26,13 +24,13 @@ interface ItemFiltersProps {
  * Syncs state to URL query parameters via router.push.
  * @returns The rendered filter sidebar with sections for title search, linked albums, years and categories, and a sort dropdown.
  */
-export default function ItemFilters({ filters, params, total, defaultOpen, onFiltersChange }: ItemFiltersProps) {
+export default function ItemFilters({ filters, params, total, onFiltersChange }: ItemFiltersProps) {
     const router = useRouter()
     const titleInputRef = useRef<HTMLInputElement>(null)
     const [debouncedTitle, setDebouncedTitle] = useState(filters.title)
     const isUserTypingTitle = useRef(false)
 
-    const [isFiltersOpen, setIsFiltersOpen] = useState(defaultOpen)
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
     const [filterTypeOpen, setFilterTypeOpen] = useState<null | 'links' | 'categories'>('links')
 
@@ -66,7 +64,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
     const isFiltered = hasActiveClosetFilters(filters)
 
     return (
-        <aside className="bg-stone-900 border border-stone-800 rounded-2xl p-4">
+        <aside className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
             {/* Mobile toggle */}
             <div className="flex items-center justify-between">
                 <button
@@ -76,9 +74,9 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                     }}
                     type="button"
                 >
-                    <span className="text-xs font-semibold text-stone-400 uppercase tracking-widest">Filters</span>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Filters</p>
                     <svg
-                        className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`}
+                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -91,11 +89,11 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                         />
                     </svg>
                 </button>
-                <h2 className="hidden lg:block text-xs font-semibold text-stone-400 uppercase tracking-widest">Filters</h2>
+                <p className="hidden lg:block text-xs font-display font-semibold text-gray-400 uppercase tracking-widest">Filters</p>
 
                 <button
                     // eslint-disable-next-line max-len
-                    className="text-xs text-brand-500 hover:text-brand-400 transition-colors font-medium px-2 py-1 rounded-lg hover:bg-brand-500/10 cursor-pointer disabled:text-stone-600 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                    className="text-xs text-brand-500 hover:text-brand-400 transition-colors font-medium px-2 py-1 rounded-lg hover:bg-brand-500/10 cursor-pointer disabled:text-gray-600 disabled:hover:bg-transparent disabled:cursor-not-allowed"
                     disabled={!isFiltered}
                     onClick={reset}
                     type="button"
@@ -114,12 +112,12 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                 <div className="space-y-4  mt-2">
                     {/* Results summary + sort */}
                     <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-stone-500">
+                        <span className="text-xs text-gray-500">
                             {Math.min(DEFAULT_LIMIT, total)} of {total} result(s)
                         </span>
                         <select
                             // eslint-disable-next-line max-len
-                            className="text-xs bg-stone-800 border border-stone-700 text-stone-200 rounded-lg px-2 py-1 focus:outline-none focus:border-brand-500 cursor-pointer"
+                            className="text-xs bg-gray-800 border border-gray-700 text-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-brand-500 cursor-pointer"
                             onChange={({ target }) => {
                                 onFiltersChange({ sort: target.value as Filters['sort'], page: 1 }, 'push')
                             }}
@@ -133,7 +131,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                     {/* Title search */}
                     <div>
                         <label
-                            className="block text-xs text-stone-400 font-medium mb-1"
+                            className="block text-xs text-gray-400 font-medium mb-1"
                             htmlFor="filter-title"
                         >
                             Title
@@ -141,7 +139,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                         <div className="relative">
                             <input
                                 // eslint-disable-next-line max-len
-                                className="w-full bg-stone-800 border border-stone-700 text-stone-200 placeholder-stone-600 rounded-xl px-3 py-2 text-sm pr-9 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
+                                className="w-full bg-gray-800 border border-gray-700 text-gray-200 placeholder-gray-600 rounded-xl px-3 py-2 text-sm pr-9 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
                                 id="filter-title"
                                 onChange={({ target }) => {
                                     isUserTypingTitle.current = true
@@ -155,7 +153,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                             {filters.title ? (
                                 <button
                                     aria-label={`Clear ${filters.title.toLowerCase()}`}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-brand-500 cursor-pointer"
+                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-500 cursor-pointer"
                                     onClick={() => {
                                         onFiltersChange({ title: '', page: 1 }, 'push')
                                     }}
@@ -176,7 +174,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                     </svg>
                                 </button>
                             ) : (
-                                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
+                                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                                     <svg
                                         className="w-4 h-4"
                                         fill="none"
@@ -200,7 +198,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                         <>
                             <button
                                 // eslint-disable-next-line max-len
-                                className="w-full flex items-center justify-between text-xs font-medium text-stone-400 cursor-pointer hover:text-stone-200 transition-colors mb-0"
+                                className="w-full flex items-center justify-between text-xs font-medium text-gray-400 cursor-pointer hover:text-gray-200 transition-colors mb-0"
                                 onClick={() => {
                                     setFilterTypeOpen(prev => (prev === 'links' ? null : 'links'))
                                 }}
@@ -246,7 +244,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                         >
                                             <input
                                                 checked={filters.links.includes(link)}
-                                                className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer min-w-4"
+                                                className="w-4 h-4 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer min-w-4"
                                                 onChange={() => {
                                                     onFiltersChange(
                                                         {
@@ -259,7 +257,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 type="checkbox"
                                             />
                                             {getAlbumDisplay(link).icon}
-                                            <span className="text-sm transition-colors truncate text-stone-400 group-hover:text-stone-200">
+                                            <span className="text-sm transition-colors truncate text-gray-400 group-hover:text-gray-200">
                                                 {link}
                                             </span>
                                         </label>
@@ -274,7 +272,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                         <>
                             <button
                                 // eslint-disable-next-line max-len
-                                className="w-full flex items-center justify-between text-xs font-medium text-stone-400 cursor-pointer hover:text-stone-200 transition-colors mb-0"
+                                className="w-full flex items-center justify-between text-xs font-medium text-gray-400 cursor-pointer hover:text-gray-200 transition-colors mb-0"
                                 onClick={() => {
                                     setFilterTypeOpen(prev => (prev === 'categories' ? null : 'categories'))
                                 }}
@@ -316,7 +314,7 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                         >
                                             <input
                                                 checked={filters.categories.includes(category)}
-                                                className="w-4 h-4 rounded border-stone-600 bg-stone-800 accent-brand-500 cursor-pointer"
+                                                className="w-4 h-4 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer"
                                                 onChange={() => {
                                                     onFiltersChange(
                                                         {
@@ -328,10 +326,10 @@ export default function ItemFilters({ filters, params, total, defaultOpen, onFil
                                                 }}
                                                 type="checkbox"
                                             />
-                                            <span className="transition-colors flex items-center text-stone-400 group-hover:text-stone-200">
+                                            <span className="transition-colors flex items-center text-gray-400 group-hover:text-gray-200">
                                                 {getCategoryDisplay(category).icon}
                                             </span>
-                                            <span className="text-sm transition-colors text-stone-400 group-hover:text-stone-200">
+                                            <span className="text-sm transition-colors text-gray-400 group-hover:text-gray-200">
                                                 {category}
                                             </span>
                                         </label>
