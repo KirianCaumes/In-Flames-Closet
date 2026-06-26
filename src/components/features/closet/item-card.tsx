@@ -4,7 +4,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import classNames from 'classnames'
+import { useRouter } from 'next/navigation'
 import { DefaultThumbnail } from 'components/ui/default-thumbnail'
+import LinkPendingOverlay from 'components/ui/link-pending-overlay'
 import { buildImageUrl, createImageStatusUpdater } from 'lib/image/identity'
 import { buildItemDetailUrl } from 'lib/projection/item'
 import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
@@ -24,6 +26,7 @@ export default function ItemCard({
     /** Whether to eagerly load and preload the image (set only for the first/LCP card) */
     readonly priority?: boolean
 }) {
+    const router = useRouter()
     const [isHovered, setIsHovered] = useState(false)
     const [statusImages, setStatusImages] = useState<Record<string, ImageStatus>>({})
     const updateImageStatus = createImageStatusUpdater(setStatusImages)
@@ -34,6 +37,10 @@ export default function ItemCard({
         <article className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col transition-colors duration-200">
             <Link
                 href={buildItemDetailUrl('', item)}
+                onMouseEnter={() => {
+                    router.prefetch(buildItemDetailUrl('', item))
+                }}
+                prefetch={false}
                 title={item.title}
             >
                 <div
@@ -46,6 +53,7 @@ export default function ItemCard({
                     }}
                 >
                     <DefaultThumbnail />
+                    <LinkPendingOverlay />
                     {statusImages[item.imagesId[0]] !== 'error' && (
                         <>
                             <Image
@@ -61,6 +69,7 @@ export default function ItemCard({
                                             !(isHovered && item.imagesId[1] && statusImages[item.imagesId[1]] !== 'error'),
                                     },
                                 )}
+                                draggable={false}
                                 fill
                                 onError={() => {
                                     updateImageStatus(item.imagesId[0], 'error')
@@ -80,6 +89,7 @@ export default function ItemCard({
                                         'absolute inset-0 object-contain transition-opacity duration-300 text-transparent',
                                         isHovered && statusImages[item.imagesId[0]] === 'resolved' ? 'opacity-100' : 'opacity-0',
                                     )}
+                                    draggable={false}
                                     fill
                                     loading="lazy"
                                     onError={() => {
@@ -104,6 +114,10 @@ export default function ItemCard({
                     <Link
                         className="text-sm font-semibold text-gray-100 hover:text-brand-400 transition-colors leading-snug line-clamp-2"
                         href={buildItemDetailUrl('', item)}
+                        onMouseEnter={() => {
+                            router.prefetch(buildItemDetailUrl('', item))
+                        }}
+                        prefetch={false}
                         title={item.title}
                     >
                         {item.title}

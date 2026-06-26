@@ -1,9 +1,8 @@
 'use client'
 
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
-import { useDebounce } from 'react-use'
 import { buildClosetUrl, DEFAULT_FILTERS, DEFAULT_LIMIT, hasActiveClosetFilters, toggleFilterValue, type Filters } from 'lib/catalog/query'
 import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
 import type { Params } from 'lib/catalog/data'
@@ -16,7 +15,7 @@ interface ItemFiltersProps {
     /** Total number of matching results */
     readonly total: number
     /** Callback to update filters and sync to URL */
-    readonly onFiltersChange: (next: Partial<Filters>, type: 'push' | 'replace' | null) => void
+    readonly onFiltersChange: (next: Partial<Filters>, type: 'push' | 'replace') => void
 }
 
 /**
@@ -26,9 +25,6 @@ interface ItemFiltersProps {
  */
 export default function ItemFilters({ filters, params, total, onFiltersChange }: ItemFiltersProps) {
     const router = useRouter()
-    const titleInputRef = useRef<HTMLInputElement>(null)
-    const [debouncedTitle, setDebouncedTitle] = useState(filters.title)
-    const isUserTypingTitle = useRef(false)
 
     const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
@@ -37,29 +33,8 @@ export default function ItemFilters({ filters, params, total, onFiltersChange }:
     const buildUrl = useCallback((partial: Partial<Filters>): string => buildClosetUrl('/', { ...filters, ...partial }), [filters])
 
     const reset = useCallback(() => {
-        setDebouncedTitle('')
         onFiltersChange(DEFAULT_FILTERS, 'push')
     }, [onFiltersChange])
-
-    // Debounce title input to avoid excessive URL updates while typing
-    useDebounce(
-        () => {
-            isUserTypingTitle.current = false
-            if (debouncedTitle !== filters.title) {
-                // TODO test ca
-                onFiltersChange({ title: debouncedTitle, page: 1 }, filters.title ? 'replace' : 'push')
-            }
-        },
-        200,
-        [debouncedTitle],
-    )
-    // Keep debouncedTitle in sync with external filters changes (e.g. when back/forward navigation)
-    useEffect(() => {
-        if (!isUserTypingTitle.current) {
-            // eslint-disable-next-line react-you-might-not-need-an-effect/no-derived-state
-            setDebouncedTitle(filters.title)
-        }
-    }, [filters.title])
 
     const isFiltered = hasActiveClosetFilters(filters)
 
@@ -142,13 +117,11 @@ export default function ItemFilters({ filters, params, total, onFiltersChange }:
                                 className="w-full bg-gray-800 border border-gray-700 text-gray-200 placeholder-gray-600 rounded-xl px-3 py-2 text-sm pr-9 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
                                 id="filter-title"
                                 onChange={({ target }) => {
-                                    isUserTypingTitle.current = true
-                                    setDebouncedTitle(target.value)
+                                    onFiltersChange({ title: target.value, page: 1 }, filters.title ? 'replace' : 'push')
                                 }}
                                 placeholder="Search title..."
-                                ref={titleInputRef}
                                 type="text"
-                                value={debouncedTitle}
+                                value={filters.title}
                             />
                             {filters.title ? (
                                 <button

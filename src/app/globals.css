@@ -24,6 +24,18 @@
     --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
     --font-mono: var(--font-plex-mono), ui-monospace, 'SFMono-Regular', monospace;
     --font-display: var(--font-oswald), var(--font-plex-sans), sans-serif;
+
+    /* Animations */
+    --animate-pending-in: fade-in 0.2s ease-out 0.15s both;
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 }
 
 @layer base {

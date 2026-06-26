@@ -2,13 +2,16 @@
 
 import classNames from 'classnames'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { buildClosetUrl, filtersFromParams, getVisiblePages } from 'lib/catalog/query'
+import { usePathname } from 'next/navigation'
+import { buildClosetUrl, getVisiblePages } from 'lib/catalog/query'
+import type { MouseEvent } from 'react'
 import type { Filters } from 'lib/catalog/query'
 
 interface PaginationProps {
     /** Total number of pages */
     readonly pages: number
+    /** Current filters (optimistic) used to mark the active page and preserve filters in page links */
+    readonly filters: Filters
     /** Callback to update filters and sync to URL */
     readonly onFiltersChange: (next: Partial<Filters>) => void
 }
@@ -17,11 +20,9 @@ interface PaginationProps {
  * Tailwind pagination component that preserves all active filter params
  * @returns The pagination navigation element, or null if there's only one page
  */
-export default function Pagination({ pages, onFiltersChange }: PaginationProps) {
+export default function Pagination({ pages, filters, onFiltersChange }: PaginationProps) {
     const pathname = usePathname()
-    const searchParams = useSearchParams()
 
-    const filters = filtersFromParams(searchParams)
     const page = filters.page
 
     const hasPrev = page > 1
@@ -35,6 +36,21 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
             'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white': enabled,
             'bg-gray-800/50 text-gray-600 cursor-not-allowed pointer-events-none': !enabled,
         })
+
+    /**
+     * Drives page navigation through the parent transition so the grid dims while loading.
+     * Modifier and non-primary clicks fall through to the link href so open-in-new-tab keeps working.
+     * @param event Click event from the page link.
+     * @param targetPage Page to navigate to.
+     */
+    const handleNavigate = (event: MouseEvent<HTMLAnchorElement>, targetPage: number) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+            return
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' })
+        event.preventDefault()
+        onFiltersChange({ page: targetPage })
+    }
 
     if (pages <= 1) {
         return null
@@ -50,8 +66,8 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                     aria-label="Previous page"
                     className={arrowCls(true)}
                     href={buildClosetUrl(pathname, { ...filters, page: page - 1 })}
-                    onClick={() => {
-                        onFiltersChange({ page: page - 1 })
+                    onClick={event => {
+                        handleNavigate(event, page - 1)
                     }}
                 >
                     <svg
@@ -111,8 +127,8 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                         )}
                         href={buildClosetUrl(pathname, { ...filters, page: p })}
                         key={p}
-                        onClick={() => {
-                            onFiltersChange({ page: p })
+                        onClick={event => {
+                            handleNavigate(event, p)
                         }}
                         scroll
                     >
@@ -126,8 +142,8 @@ export default function Pagination({ pages, onFiltersChange }: PaginationProps) 
                     aria-label="Next page"
                     className={arrowCls(true)}
                     href={buildClosetUrl(pathname, { ...filters, page: page + 1 })}
-                    onClick={() => {
-                        onFiltersChange({ page: page + 1 })
+                    onClick={event => {
+                        handleNavigate(event, page + 1)
                     }}
                 >
                     <svg

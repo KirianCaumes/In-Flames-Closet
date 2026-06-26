@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useOptimistic, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -9,58 +9,53 @@ import classNames from 'classnames'
 import ItemCard from 'components/features/closet/item-card'
 import ItemFilters from 'components/features/closet/item-filters'
 import Pagination from 'components/ui/pagination'
-import { applyClosetQuery, areFiltersEqual, buildClosetUrl, DEFAULT_FILTERS, filtersFromParams, type Filters } from 'lib/catalog/query'
+import { buildClosetUrl, DEFAULT_FILTERS, filtersFromParams, type Filters } from 'lib/catalog/query'
 // eslint-disable-next-line no-restricted-imports
 import IconSvg from '../../../../public/favicon.svg'
 import type { Item, Params } from 'lib/catalog/data'
 
 interface ClosetPageProps {
-    /** All items (unfiltered) */
-    readonly items: Array<Item>
+    /** Items visible on the current page */
+    readonly pagedItems: Array<Item>
+    /** Total number of matching items */
+    readonly total: number
+    /** Total number of matching pages */
+    readonly pages: number
+    /** Total number of archived items, ignoring filters */
+    readonly archivedCount: number
     /** All available filter options */
     readonly params: Params
 }
 
 /**
  * Main archive page - sticky header, filters sidebar, items grid and pagination.
- * Reads URL search params, applies filters and pagination client-side.
+ * Renders the server-filtered page and syncs filter state to the URL; navigation re-renders on the server.
  * @returns The rendered closet page with header, filters, items grid, pagination and footer
  */
-export default function ClosetPage({ items, params }: ClosetPageProps) {
+export default function ClosetPage({ pagedItems, total, pages, archivedCount, params }: ClosetPageProps) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    const [filters, setFilters] = useState<Filters>(() => filtersFromParams(searchParams))
-    const deferredFilters = useDeferredValue(filters)
-    const isStale = filters !== deferredFilters
+    const [isPending, startTransition] = useTransition()
 
-    // Sync filters when URL changes (e.g., browser back/forward navigation)
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setFilters(prev => {
-            const newFilters = filtersFromParams(searchParams)
-            // Only update if filters actually changed
-            if (areFiltersEqual(prev, newFilters)) {
-                return prev
-            }
-            return newFilters
-        })
-    }, [searchParams])
-
-    const { pagedItems, total, pages } = useMemo(() => applyClosetQuery(items, deferredFilters), [items, deferredFilters])
+    // The URL stays the source of truth, kept in sync by the server round-trip.
+    // An optimistic overlay reflects checkbox, sort, and pagination changes instantly while that re-render lands.
+    const urlFilters = filtersFromParams(searchParams)
+    const [filters, setOptimisticFilters] = useOptimistic(urlFilters, (_current: Filters, next: Filters) => next)
 
     /**
-     * Updates filters state and syncs the new filter values to the URL.
+     * Reflects the updated filters instantly (optimistically), then navigates to their URL so the server
+     * re-renders the matching page; the optimistic value reverts to the URL once navigation commits.
      * @param next - New filter values to apply
      * @param type - Whether to push a new history entry or replace the current one (default: push)
      */
-    function handleFiltersChange(next: Partial<Filters>, type: 'push' | 'replace' | null = 'push') {
+    function handleFiltersChange(next: Partial<Filters>, type: 'push' | 'replace' = 'push') {
         const updatedFilters = { ...filters, ...next }
-        setFilters(updatedFilters)
-        if (type) {
+        startTransition(() => {
+            setOptimisticFilters(updatedFilters)
             router[type](buildClosetUrl(pathname, updatedFilters), { scroll: true })
-        }
+        })
     }
 
     return (
@@ -90,7 +85,7 @@ export default function ClosetPage({ items, params }: ClosetPageProps) {
                         </h1>
                     </div>
                     <div className="text-right shrink-0">
-                        <div className="text-2xl font-display font-bold text-brand-500 tabular-nums">{items.length}</div>
+                        <div className="text-2xl font-display font-bold text-brand-500 tabular-nums">{archivedCount}</div>
                         <div className="text-xs text-gray-400">items archived</div>
                     </div>
                 </div>
@@ -146,8 +141,8 @@ export default function ClosetPage({ items, params }: ClosetPageProps) {
                                     className={classNames(
                                         'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150',
                                         {
-                                            'opacity-50': isStale,
-                                            'opacity-100': !isStale,
+                                            'opacity-50': isPending,
+                                            'opacity-100': !isPending,
                                         },
                                     )}
                                 >
@@ -161,8 +156,9 @@ export default function ClosetPage({ items, params }: ClosetPageProps) {
                                 </div>
                                 <div className="mt-8">
                                     <Pagination
+                                        filters={filters}
                                         onFiltersChange={next => {
-                                            handleFiltersChange({ ...filters, ...next }, null)
+                                            handleFiltersChange(next, 'push')
                                         }}
                                         pages={pages}
                                     />
