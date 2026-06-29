@@ -12,19 +12,21 @@ const SITE_DESCRIPTION =
 const BAND_REF = { '@id': `${SITE_URL}/#band` }
 
 /**
- * Builds the schema.org `Product` node for one closet item.
+ * Builds the schema.org `CreativeWork` node for one closet item.
+ * These are archived artworks, not items for sale, so `CreativeWork` is used instead of `Product`
+ * (Google requires `offers`, `review`, or `aggregateRating` on `Product`, none of which apply here).
  * @param item Closet item.
- * @returns Product structured-data node.
+ * @returns CreativeWork structured-data node.
  */
-function buildProduct(item: Item): Record<string, unknown> {
+function buildCreativeWork(item: Item): Record<string, unknown> {
     return {
-        '@type': 'Product',
+        '@type': 'CreativeWork',
         name: item.title || 'Unknown',
         url: buildItemDetailUrl(SITE_URL, item),
         ...(item.imagesId[0] && { image: buildAbsoluteImageUrl(SITE_URL, { folderId: item.folderId, imageId: item.imagesId[0] }) }),
-        ...(item.category && { category: item.category }),
-        ...(item.year && { releaseDate: item.year }),
-        brand: { '@type': 'MusicGroup', name: 'In Flames' },
+        ...(item.category && { genre: item.category }),
+        ...(item.year && { datePublished: item.year }),
+        creator: BAND_REF,
     }
 }
 
@@ -96,7 +98,7 @@ export function ClosetStructuredData({
                     itemListElement: items.map((item, index) => ({
                         '@type': 'ListItem',
                         position: index + 1,
-                        item: buildProduct(item),
+                        item: buildCreativeWork(item),
                     })),
                 },
             },
@@ -107,7 +109,7 @@ export function ClosetStructuredData({
 }
 
 /**
- * Renders JSON-LD structured data for a single closet item detail page (BreadcrumbList + Product).
+ * Renders JSON-LD structured data for a single closet item detail page (BreadcrumbList + CreativeWork).
  * @returns The structured-data script element.
  */
 export function ItemStructuredData({
@@ -130,15 +132,15 @@ export function ItemStructuredData({
                 ],
             },
             {
-                '@type': 'Product',
+                '@type': 'CreativeWork',
                 name: item.title || 'Unknown',
                 url: buildItemDetailUrl(SITE_URL, item),
                 ...(images.length > 0 && { image: images }),
                 ...(description && { description }),
-                ...(item.category && { category: item.category }),
-                ...(item.year && { releaseDate: item.year }),
-                brand: { '@type': 'MusicGroup', name: 'In Flames' },
-                ...(item.link && { isRelatedTo: { '@type': 'MusicAlbum', name: item.link } }),
+                ...(item.category && { genre: item.category }),
+                ...(item.year && { datePublished: item.year }),
+                creator: { '@type': 'MusicGroup', name: 'In Flames' },
+                ...(item.link && { about: { '@type': 'MusicAlbum', name: item.link } }),
             },
         ],
     }
