@@ -9,7 +9,7 @@ const SITE_URL = process.env.SITE_URL ?? 'https://in-flames-closet.kiriancaumes.
  */
 export default function robots(): MetadataRoute.Robots {
     return {
-        rules: [{ userAgent: '*', disallow: '/' }],
+        rules: [{ userAgent: '*', allow: '/' }],
         sitemap: `${SITE_URL}/sitemap.xml`,
         host: SITE_URL,
     }
