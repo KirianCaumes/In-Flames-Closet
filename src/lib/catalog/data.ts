@@ -1,6 +1,3 @@
-const RANGE_DATA = 'Data!A1:I9999'
-const RANGE_PARAMS = 'Params!A1:D9999'
-
 /** Raw Google Sheet response shape for the closet catalog. */
 export interface GoogleApiResponse {
     /** Range returned by Google Sheets. */
@@ -57,24 +54,6 @@ export interface Params {
     readonly years: Array<string>
     /** Categories. */
     readonly categories: Array<string>
-}
-
-/**
- * Fetch all closet items in newest-first order.
- * @returns Closet items.
- */
-export async function fetchClosetItems(): Promise<Array<Item>> {
-    const raw = await fetchCloset(RANGE_DATA)
-    return parseClosetItems(raw).reverse()
-}
-
-/**
- * Fetch available closet query parameters.
- * @returns Available linked albums, years, and categories.
- */
-export async function fetchClosetFilters(): Promise<Params> {
-    const raw = await fetchCloset(RANGE_PARAMS)
-    return parseClosetFilters(raw)
 }
 
 /**
@@ -151,28 +130,4 @@ function normalizeFilter(row: RawFilterRow): ClosetFilterRow {
         link: row[1] ?? '',
         year: row[2] ?? '',
     }
-}
-
-/**
- * Fetches one Google Sheets range.
- * @param range Display range to fetch.
- * @returns Raw Google Sheets response.
- */
-async function fetchCloset(range: string): Promise<GoogleApiResponse> {
-    const sheetId = process.env.GOOGLE_SHEET_ID
-    const apiKey = process.env.GOOGLE_API_KEY
-    if (!sheetId || !apiKey) {
-        throw new Error('Missing Google Sheets configuration')
-    }
-
-    const url = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}`)
-    url.searchParams.set('key', apiKey)
-
-    const response = await fetch(url.toString(), { next: { revalidate: 3600 } })
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch Google Sheet range ${range}: HTTP ${response.status}`)
-    }
-
-    return (await response.json()) as GoogleApiResponse
 }

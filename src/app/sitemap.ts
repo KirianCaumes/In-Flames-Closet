@@ -1,4 +1,4 @@
-import { fetchClosetItems } from 'lib/catalog/data'
+import { fetchClosetItems } from 'lib/catalog/fetch-closet'
 import { buildItemDetailUrl } from 'lib/projection/item'
 import type { MetadataRoute } from 'next'
 

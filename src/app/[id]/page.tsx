@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import ItemDetail from 'components/features/item-detail/item-detail'
 import { ItemStructuredData } from 'components/structured-data'
-import { fetchClosetItems } from 'lib/catalog/data'
+import { fetchClosetItems } from 'lib/catalog/fetch-closet'
 import { projectItemMetadata } from 'lib/projection/item'
 import type { Metadata } from 'next'
 
