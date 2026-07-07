@@ -33,7 +33,7 @@ export const metadata: Metadata = {
         description:
             // eslint-disable-next-line max-len
             'An archive of In Flames artworks throughout the years: clothes, goodies, and more! Explore the history of the band through their merchandise and official products.',
-        images: [{ url: '/favicon.png', width: 313, height: 313, alt: 'In Flames' }],
+        images: [{ url: '/favicon.png', width: 512, height: 512, alt: 'In Flames Closet' }],
     },
     twitter: {
         card: 'summary',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
         description:
             // eslint-disable-next-line max-len
             'An archive of In Flames artworks throughout the years: clothes, goodies, and more! Explore the history of the band through their merchandise and official products.',
-        images: ['/favicon.png'], // TODO faire les png
+        images: ['/favicon.png'],
     },
     icons: {
         icon: '/favicon.svg',
