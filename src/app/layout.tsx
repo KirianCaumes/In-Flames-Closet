@@ -1,7 +1,7 @@
 // eslint-disable-next-line camelcase
 import { Oswald, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
 import GdprBanner from 'components/layout/gdpr-banner'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 // eslint-disable-next-line no-restricted-imports
 import './globals.css'
@@ -47,6 +47,12 @@ export const metadata: Metadata = {
         icon: '/favicon.svg',
         shortcut: '/favicon.svg',
     },
+}
+
+export const viewport: Viewport = {
+    themeColor: "#F59E0B",
+    width: 'device-width',
+    initialScale: 1,
 }
 
 /**
