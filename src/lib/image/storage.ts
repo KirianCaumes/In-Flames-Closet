@@ -73,7 +73,7 @@ export async function serveClosetImage(req: NextRequest, identity: ClosetImageId
                 'Content-Type': 'image',
                 ETag: etag,
                 'Last-Modified': lastModified,
-                'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
+                'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=7776000, stale-if-error=7776000',
             },
         })
     } catch {
@@ -109,7 +109,7 @@ async function proxyProductionImage(identity: ClosetImageIdentity): Promise<Resp
     return new Response(response.body, {
         headers: {
             'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=86400',
+            'Cache-Control': 'public, max-age=2678400, stale-while-revalidate=7776000, stale-if-error=7776000',
         },
     })
 }
