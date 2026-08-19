@@ -1,7 +1,7 @@
 // eslint-disable-next-line camelcase
 import { Oswald, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
 import GdprBanner from 'components/layout/gdpr-banner'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 // eslint-disable-next-line no-restricted-imports
 import './globals.css'
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
         description:
             // eslint-disable-next-line max-len
             'An archive of In Flames artworks throughout the years: clothes, goodies, and more! Explore the history of the band through their merchandise and official products.',
-        images: [{ url: '/favicon.png', width: 313, height: 313, alt: 'In Flames' }],
+        images: [{ url: '/favicon.png', width: 512, height: 512, alt: 'In Flames Closet' }],
     },
     twitter: {
         card: 'summary',
@@ -41,12 +41,18 @@ export const metadata: Metadata = {
         description:
             // eslint-disable-next-line max-len
             'An archive of In Flames artworks throughout the years: clothes, goodies, and more! Explore the history of the band through their merchandise and official products.',
-        images: ['/favicon.png'], // TODO faire les png
+        images: ['/favicon.png'],
     },
     icons: {
         icon: '/favicon.svg',
         shortcut: '/favicon.svg',
     },
+}
+
+export const viewport: Viewport = {
+    themeColor: "#F59E0B",
+    width: 'device-width',
+    initialScale: 1,
 }
 
 /**
