@@ -5,3 +5,4 @@ package-lock.json
 *.md
 public/*.js
 public/*.xml
+next-env.d.ts

@@ -9,7 +9,6 @@ import type { Metadata } from 'next'
  * Generate per-item Open Graph metadata
  * @returns Metadata for the item detail page, including title, description, and Open Graph/Twitter card info
  */
-// eslint-disable-next-line react-refresh/only-export-components
 export async function generateMetadata({
     params,
 }: {

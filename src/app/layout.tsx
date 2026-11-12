@@ -10,7 +10,6 @@ const plexSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-mono', display: 'swap' })
 const oswald = Oswald({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-oswald', display: 'swap' })
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
     title: {
         default: "In Flames Closet - Archive of the band's artworks",
@@ -50,7 +49,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-    themeColor: "#F59E0B",
+    themeColor: '#F59E0B',
     width: 'device-width',
     initialScale: 1,
 }

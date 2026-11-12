@@ -3,7 +3,6 @@ import { ClosetStructuredData } from 'components/structured-data'
 import { fetchClosetFilters, fetchClosetItems } from 'lib/catalog/fetch-closet'
 import { applyClosetQuery, filtersFromParams } from 'lib/catalog/query'
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const dynamic = 'force-dynamic'
 
 /**

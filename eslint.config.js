@@ -28,7 +28,7 @@ export default [
     esPrettier,
     esYouMightNotNeedAnEffect.configs.recommended,
     esReactHooks.configs.flat.recommended,
-    esReactRefresh.configs.recommended,
+    esReactRefresh.configs.next,
     esReactCompiler.configs.recommended,
     ...esNext,
     {
