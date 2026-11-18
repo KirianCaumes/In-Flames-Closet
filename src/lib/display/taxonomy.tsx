@@ -9,6 +9,8 @@ export interface AlbumDisplay {
     name: string
     /** Optional album cover path. */
     cover?: string
+    /** Optional album release year. */
+    year?: string
     /** Short label for compact UI. */
     shortLabel: string
     /** Icon node used next to the album label. */
@@ -31,10 +33,11 @@ export interface CategoryDisplay {
  * @returns Album display metadata.
  */
 export function getAlbumDisplay(name: string): AlbumDisplay {
-    const cover = albums[name]
+    const { cover, year } = albums[name] ?? {}
     return {
         name,
         cover,
+        year,
         shortLabel: shortenAlbumName(name),
         icon: cover ? (
             <Image

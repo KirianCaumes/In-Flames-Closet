@@ -14,16 +14,10 @@
     --color-gray-900: #141414; /* cards, header, panels */
     --color-gray-950: #0a0a0a; /* root background, overlays */
 
-    /* Brand orange */
-    --color-brand-300: #fcd34d;
-    --color-brand-400: #fbbf24;
-    --color-brand-500: #f59e0b;
-    --color-brand-600: #d97706;
-
-    /* Type roles */
-    --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
-    --font-mono: var(--font-plex-mono), ui-monospace, 'SFMono-Regular', monospace;
-    --font-display: var(--font-oswald), var(--font-plex-sans), sans-serif;
+    /* Brand orange: light, hover, accent */
+    --color-brand-300: #ffa264;
+    --color-brand-400: #fc8731;
+    --color-brand-500: #f27700;
 
     /* Animations */
     --animate-pending-in: fade-in 0.2s ease-out 0.15s both;
@@ -38,7 +32,18 @@
     }
 }
 
+/* Inline so the next/font variables, set on <body>, resolve where the utilities are used rather than on :root */
+@theme inline {
+    --font-sans: var(--font-schibsted), system-ui, sans-serif;
+    --font-display: var(--font-besley), Georgia, serif;
+}
+
 @layer base {
+    /* Dark theme only: native controls and scrollbars follow it */
+    :root {
+        color-scheme: dark;
+    }
+
     /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 6px;

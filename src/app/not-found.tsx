@@ -15,7 +15,7 @@ export default function NotFound() {
                 The item or page you&apos;re looking for doesn&apos;t exist or may have been removed.
             </p>
             <Link
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-gray-950 font-medium transition-colors"
                 href="/"
             >
                 <svg

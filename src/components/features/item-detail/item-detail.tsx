@@ -296,9 +296,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                         className="flex items-center gap-3 px-4 py-3"
                                         key={row.label}
                                     >
-                                        <dt className="text-xs font-semibold text-gray-500 uppercase tracking-wider w-24 shrink-0">
-                                            {row.label}
-                                        </dt>
+                                        <dt className="text-xs font-semibold text-gray-500 w-24 shrink-0">{row.label}</dt>
                                         <dd className="flex items-center gap-2 text-sm text-gray-300 min-w-0">
                                             {row.label === 'Category' && (
                                                 <span className="text-gray-400">{getCategoryDisplay(row.value).icon}</span>

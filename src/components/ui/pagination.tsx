@@ -31,12 +31,6 @@ export default function Pagination({ pages, filters, onFiltersChange }: Paginati
     // Build visible page numbers (always show first, last and 2 neighbours)
     const visiblePages = getVisiblePages(page, pages)
 
-    const arrowCls = (enabled: boolean) =>
-        classNames('inline-flex items-center justify-center w-9 h-9 rounded-xl transition-colors', {
-            'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white': enabled,
-            'bg-gray-800/50 text-gray-600 cursor-not-allowed pointer-events-none': !enabled,
-        })
-
     /**
      * Drives page navigation through the parent transition so the grid dims while loading.
      * Modifier and non-primary clicks fall through to the link href so open-in-new-tab keeps working.
@@ -59,56 +53,25 @@ export default function Pagination({ pages, filters, onFiltersChange }: Paginati
     return (
         <nav
             aria-label="Pagination"
-            className="flex items-center justify-center gap-1.5 flex-wrap"
+            className="flex items-center justify-center gap-1 flex-wrap text-[13px] tabular-nums"
         >
-            {hasPrev ? (
+            {hasPrev && (
                 <Link
                     aria-label="Previous page"
-                    className={arrowCls(true)}
+                    className="inline-flex items-center justify-center min-w-11 h-11 px-3 rounded-lg text-gray-100 hover:text-white transition-colors"
                     href={buildClosetUrl(pathname, { ...filters, page: page - 1 })}
                     onClick={event => {
                         handleNavigate(event, page - 1)
                     }}
                 >
-                    <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M15 19l-7-7 7-7"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                        />
-                    </svg>
+                    Previous
                 </Link>
-            ) : (
-                <span
-                    aria-disabled="true"
-                    className={arrowCls(false)}
-                >
-                    <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M15 19l-7-7 7-7"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                        />
-                    </svg>
-                </span>
             )}
 
             {visiblePages.map((p, i) =>
                 p === null ? (
                     <span
-                        className="text-gray-500 px-1"
+                        className="inline-flex items-center justify-center min-w-8 h-11 text-gray-400"
                         // eslint-disable-next-line react/no-array-index-key
                         key={`ellipsis-${i}`}
                     >
@@ -118,13 +81,10 @@ export default function Pagination({ pages, filters, onFiltersChange }: Paginati
                     <Link
                         aria-current={p === page ? 'page' : undefined}
                         aria-label={`Page ${p}`}
-                        className={classNames(
-                            'inline-flex items-center justify-center min-w-9 h-9 px-2 rounded-xl text-sm font-medium transition-colors',
-                            {
-                                'bg-brand-500 text-white': p === page,
-                                'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white': p !== page,
-                            },
-                        )}
+                        className={classNames('inline-flex items-center justify-center min-w-11 h-11 px-2 rounded-lg transition-colors', {
+                            'border border-brand-500 text-brand-500': p === page,
+                            'text-gray-400 hover:text-gray-100': p !== page,
+                        })}
                         href={buildClosetUrl(pathname, { ...filters, page: p })}
                         key={p}
                         onClick={event => {
@@ -137,48 +97,17 @@ export default function Pagination({ pages, filters, onFiltersChange }: Paginati
                 ),
             )}
 
-            {hasNext ? (
+            {hasNext && (
                 <Link
                     aria-label="Next page"
-                    className={arrowCls(true)}
+                    className="inline-flex items-center justify-center min-w-11 h-11 px-3 rounded-lg text-gray-100 hover:text-white transition-colors"
                     href={buildClosetUrl(pathname, { ...filters, page: page + 1 })}
                     onClick={event => {
                         handleNavigate(event, page + 1)
                     }}
                 >
-                    <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M9 5l7 7-7 7"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                        />
-                    </svg>
+                    Next
                 </Link>
-            ) : (
-                <span
-                    aria-disabled="true"
-                    className={arrowCls(false)}
-                >
-                    <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M9 5l7 7-7 7"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                        />
-                    </svg>
-                </span>
             )}
         </nav>
     )

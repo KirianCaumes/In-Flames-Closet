@@ -57,7 +57,7 @@ export default function Loading() {
                                     className="flex items-center gap-3 px-4 py-3"
                                     key={label}
                                 >
-                                    <dt className="text-xs font-semibold text-gray-500 uppercase tracking-wider w-24 shrink-0">{label}</dt>
+                                    <dt className="text-xs font-semibold text-gray-500 w-24 shrink-0">{label}</dt>
                                     <dd className="text-sm">
                                         <span className="inline-block h-[0.7em] w-32 max-w-full rounded bg-gray-800 align-middle animate-pulse" />
                                     </dd>

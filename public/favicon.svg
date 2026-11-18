@@ -1,122 +1,50 @@
 <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="110 103 375 375"
-    width="100%"
-    height="100%"
+    viewBox="0 0 64 64"
 >
-    <!-- Black background with rounded corners -->
     <rect
-        x="110"
-        y="103"
-        width="375"
-        height="375"
-        rx="45"
-        ry="45"
+        width="64"
+        height="64"
+        rx="14"
         fill="#111111"
-    />
-
-    <polygon
-        points="300,120 460,200 460,380 300,460 140,380 140,200"
+    ></rect>
+    <path
+        transform="translate(32 32) scale(0.0533) translate(-440 -580)"
+        d="M318 252 440 55 718 502 447 1060M140 538 60 668 440 1105 820 668 740 538M273 325 183 470M433 1060 58 292H545M625 292H822L737 468M440 292V1105M440 470 552 580 440 690 328 580Z"
         fill="none"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-    />
-
-    <line
-        x1="300"
-        y1="280"
-        x2="300"
-        y2="460"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-    />
-    <line
-        x1="140"
-        y1="200"
-        x2="300"
-        y2="280"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-    />
-    <line
-        x1="460"
-        y1="200"
-        x2="300"
-        y2="280"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-    />
-
-    <polygon
-        points="360,150 400,170 240,250 240,370 220,330 200,350 200,230"
-        stroke-width="18"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-        stroke="rgb(180, 83, 9)"
-        fill="rgb(180, 83, 9)"
-    />
-    <!-- 
-    <line
-        x1="156"
-        y1="340"
-        x2="156"
-        y2="365"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linecap="round"
-    />
-    <line
-        x1="164"
-        y1="344"
-        x2="164"
-        y2="369"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linecap="round"
-    />
-    <line
-        x1="172"
-        y1="348"
-        x2="172"
-        y2="373"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linecap="round"
-    />
-    <line
-        x1="180"
-        y1="352"
-        x2="180"
-        y2="377"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linecap="round"
-    />
-    <line
-        x1="188"
-        y1="356"
-        x2="188"
-        y2="381"
-        stroke="rgb(245, 158, 11)"
-        stroke-width="18"
-        stroke-linecap="round"
-    /> -->
-    <line
-        x1="364"
-        y1="400"
-        x2="396"
-        y2="384"
-        stroke="rgb(180, 83, 9)"
-        stroke-width="18"
-        stroke-linejoin="round"
-        stroke-linecap="round"
-    />
+        stroke="#5c5c5c"
+        stroke-width="34"
+        stroke-linejoin="miter"
+    ></path>
+    <g transform="translate(32 35) scale(0.58) translate(-32 -32)">
+        <path
+            d="M32 9 53 19.5V44.5L32 55 11 44.5V19.5Z"
+            fill="#111111"
+            stroke="#111111"
+            stroke-width="7"
+            stroke-linejoin="round"
+        ></path>
+        <g
+            stroke="#111111"
+            stroke-width="2"
+            stroke-linejoin="round"
+        >
+            <path
+                d="M32 9 53 19.5 32 30 11 19.5Z"
+                fill="#ffa264"
+            ></path>
+            <path
+                d="M11 19.5 32 30V55L11 44.5Z"
+                fill="#f27700"
+            ></path>
+            <path
+                d="M53 19.5 32 30V55L53 44.5Z"
+                fill="#c14200"
+            ></path>
+        </g>
+        <path
+            d="M38.5 12.25 46.5 16.25 25.5 26.75V36.5L17.5 32.5V22.75Z"
+            fill="#111111"
+        ></path>
+    </g>
 </svg>

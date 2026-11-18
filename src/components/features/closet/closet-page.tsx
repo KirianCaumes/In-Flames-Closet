@@ -28,7 +28,7 @@ interface ClosetPageProps {
 }
 
 /**
- * Main archive page - sticky header, filters sidebar, items grid and pagination.
+ * Main archive page - header, hero with counts, release strip, filters toolbar, items grid and pagination.
  * Renders the server-filtered page and syncs filter state to the URL; navigation re-renders on the server.
  * @returns The rendered closet page with header, filters, items grid, pagination and footer
  */
@@ -60,113 +60,132 @@ export default function ClosetPage({ pagedItems, total, pages, archivedCount, pa
 
     return (
         <>
-            {/* ── Sticky header ──────────────────────────────────────── */}
-            <header className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                        <Link href="/">
-                            <Image
-                                alt="In Flames Closet"
-                                className="w-12 h-12 object-cover shrink-0"
-                                height={48}
-                                loading="eager"
-                                src={IconSvg as string}
-                                width={48}
-                            />
+            <header className="border-b border-gray-800 text-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center gap-x-7 gap-y-3">
+                    <Link
+                        className="inline-flex items-center gap-2.5 min-h-11"
+                        href="/"
+                    >
+                        <Image
+                            alt=""
+                            className="size-9 shrink-0"
+                            height={36}
+                            loading="eager"
+                            src={IconSvg as string}
+                            width={36}
+                        />
+                        <span className="font-display font-semibold text-[21px] text-gray-100">
+                            In Flames <span className="text-brand-500">Closet</span>
+                        </span>
+                    </Link>
+                    <div className="grow" />
+                    <nav
+                        aria-label="In Flames archives"
+                        className="flex border border-gray-800 rounded-lg overflow-hidden"
+                    >
+                        <Link
+                            aria-current="page"
+                            className="inline-flex items-center gap-2 min-h-11 px-3.5 bg-gray-800 text-gray-100 font-medium"
+                            href="/"
+                        >
+                            <span className="size-2 rounded-full bg-brand-500" />
+                            Closet
                         </Link>
-                        <div className="w-px h-8 bg-gradient-to-b from-brand-500 to-brand-600 hidden sm:block" />
-                        <h1 className="leading-tight">
-                            <span className="block text-xl sm:text-2xl font-display font-bold tracking-wide uppercase text-brand-500">
-                                In Flames
-                            </span>
-                            <span className="block text-gray-400 text-xs sm:text-sm tracking-wide font-normal">
-                                Archive of the band's artworks
-                            </span>
-                        </h1>
-                    </div>
-                    <div className="text-right shrink-0">
-                        <div className="text-2xl font-display font-bold text-brand-500 tabular-nums">{archivedCount}</div>
-                        <div className="text-xs text-gray-400">items archived</div>
-                    </div>
+                        <a
+                            className="inline-flex items-center gap-2 min-h-11 px-3.5 text-gray-400 hover:text-gray-100 transition-colors"
+                            href="https://in-flames-bootlegs.kiriancaumes.fr"
+                        >
+                            <span className="size-2 rounded-full bg-[#e6443d]" />
+                            Bootlegs
+                        </a>
+                    </nav>
                 </div>
             </header>
 
-            {/* ── Main content ───────────────────────────────────────── */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-                <h2 className="sr-only">Browse the In Flames merch &amp; artwork archive</h2>
-                <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Sidebar filters */}
-                    <div className="w-full lg:w-64 xl:w-72 shrink-0">
-                        <div className="sticky top-24">
-                            <ItemFilters
-                                filters={filters}
-                                onFiltersChange={handleFiltersChange}
-                                params={params}
-                                total={total}
-                            />
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-12 flex flex-col gap-7 text-sm">
+                <section className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+                    <div className="max-w-160">
+                        <h1 className="font-display font-semibold text-[34px] leading-[1.15] text-gray-50">Merch &amp; artwork archive</h1>
+                        <p className="mt-2 text-[15px] leading-[1.55] text-gray-400">
+                            The history of In Flames through their artworks: clothes, goodies, and more.
+                        </p>
+                    </div>
+                    <dl className="flex">
+                        <div className="flex flex-col-reverse gap-0.5 pr-5">
+                            <dt className="text-xs text-gray-400">Items</dt>
+                            <dd className="text-xl font-medium tabular-nums text-gray-100">{archivedCount}</dd>
                         </div>
-                    </div>
+                        <div className="flex flex-col-reverse gap-0.5 pl-5 border-l border-gray-800">
+                            <dt className="text-xs text-gray-400">Releases</dt>
+                            <dd className="text-xl font-medium tabular-nums text-gray-100">{params.links.length}</dd>
+                        </div>
+                    </dl>
+                </section>
 
-                    {/* Items grid */}
-                    <div className="flex-1 min-w-0">
-                        {pagedItems.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-                                <svg
-                                    className="w-12 h-12 text-gray-700"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                    />
-                                </svg>
-                                <p className="text-gray-400 font-medium">No items match your filters</p>
-                                <button
-                                    className="text-sm text-brand-500 hover:text-brand-400 underline underline-offset-2 transition-colors cursor-pointer"
-                                    onClick={() => {
-                                        handleFiltersChange(DEFAULT_FILTERS, 'push')
-                                    }}
-                                    type="button"
-                                >
-                                    Reset filters
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div
-                                    className={classNames(
-                                        'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 transition-opacity duration-150',
-                                        {
-                                            'opacity-50': isPending,
-                                            'opacity-100': !isPending,
-                                        },
-                                    )}
-                                >
-                                    {pagedItems.map((item, i) => (
-                                        <ItemCard
-                                            item={item}
-                                            key={item.folderId}
-                                            priority={i === 0}
-                                        />
-                                    ))}
-                                </div>
-                                <div className="mt-8">
-                                    <Pagination
-                                        filters={filters}
-                                        onFiltersChange={next => {
-                                            handleFiltersChange(next, 'push')
-                                        }}
-                                        pages={pages}
-                                    />
-                                </div>
-                            </>
-                        )}
+                <ItemFilters
+                    archivedCount={archivedCount}
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    params={params}
+                    shown={pagedItems.length}
+                    total={total}
+                />
+
+                <h2 className="sr-only">Items</h2>
+                {pagedItems.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+                        <svg
+                            className="w-12 h-12 text-gray-700"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                            />
+                        </svg>
+                        <p className="text-gray-400 font-medium">No items match your filters</p>
+                        <button
+                            className="text-sm text-brand-500 hover:text-brand-400 underline underline-offset-2 transition-colors cursor-pointer"
+                            onClick={() => {
+                                handleFiltersChange(DEFAULT_FILTERS, 'push')
+                            }}
+                            type="button"
+                        >
+                            Reset filters
+                        </button>
                     </div>
-                </div>
+                ) : (
+                    <>
+                        <div
+                            className={classNames(
+                                'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-x-4 gap-y-7 transition-opacity duration-150',
+                                {
+                                    'opacity-50': isPending,
+                                    'opacity-100': !isPending,
+                                },
+                            )}
+                        >
+                            {pagedItems.map((item, i) => (
+                                <ItemCard
+                                    item={item}
+                                    key={item.folderId}
+                                    priority={i === 0}
+                                />
+                            ))}
+                        </div>
+                        <Pagination
+                            filters={filters}
+                            onFiltersChange={next => {
+                                handleFiltersChange(next, 'push')
+                            }}
+                            pages={pages}
+                        />
+                    </>
+                )}
             </main>
         </>
     )

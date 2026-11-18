@@ -1,14 +1,13 @@
 // eslint-disable-next-line camelcase
-import { Oswald, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
+import { Besley, Schibsted_Grotesk } from 'next/font/google'
 import GdprBanner from 'components/layout/gdpr-banner'
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 // eslint-disable-next-line no-restricted-imports
 import './globals.css'
 
-const plexSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-plex-sans', display: 'swap' })
-const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-plex-mono', display: 'swap' })
-const oswald = Oswald({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-oswald', display: 'swap' })
+const schibsted = Schibsted_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-schibsted', display: 'swap' })
+const besley = Besley({ subsets: ['latin'], weight: ['500', '600', '700'], variable: '--font-besley', display: 'swap' })
 
 export const metadata: Metadata = {
     title: {
@@ -49,7 +48,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-    themeColor: '#F59E0B',
+    themeColor: '#0a0a0a',
     width: 'device-width',
     initialScale: 1,
 }
@@ -68,29 +67,37 @@ export default function RootLayout({
             lang="en"
             suppressHydrationWarning
         >
-            <body
-                className={`${plexSans.variable} ${plexMono.variable} ${oswald.variable} font-sans bg-gray-950 text-gray-100 min-h-screen`}
-            >
+            <body className={`${schibsted.variable} ${besley.variable} font-sans bg-gray-950 text-gray-100 min-h-screen`}>
                 {/* Thumbnails fade in via an onLoad handler; with JS disabled that never fires, so reveal them here. */}
                 <noscript>
                     <style>{`.thumb-image{opacity:1 !important}`}</style>
                 </noscript>
                 {children}
 
-                {/* ── Footer ─────────────────────────────────────────────── */}
-                <footer className="border-t border-gray-800/50 mt-12 py-10">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center gap-4">
-                        <p className="text-gray-500 text-xs text-center">
-                            Non-commercial fan archive. All recordings and trademarks belong to their respective owners.
-                        </p>
-                        <a
-                            className="text-xs text-brand-400 hover:text-brand-300 transition-colors"
-                            href="https://jesterscollection.kiriancaumes.fr"
-                            rel="noopener noreferrer"
-                            target="_blank"
+                <footer className="border-t border-gray-800">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-x-8 gap-y-2 text-[13px] text-gray-400">
+                        <p>Non-commercial fan archive. All artworks and trademarks belong to their respective owners.</p>
+                        <nav
+                            aria-label="Related sites"
+                            className="flex flex-wrap gap-x-5 gap-y-1"
                         >
-                            jesterscollection.kiriancaumes.fr
-                        </a>
+                            <a
+                                className="inline-flex items-center min-h-11 text-gray-100 hover:text-white transition-colors"
+                                href="https://in-flames-bootlegs.kiriancaumes.fr"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                In Flames Bootlegs
+                            </a>
+                            <a
+                                className="inline-flex items-center min-h-11 text-gray-100 hover:text-white transition-colors"
+                                href="https://jesterscollection.kiriancaumes.fr"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                A Jester&apos;s Collection
+                            </a>
+                        </nav>
                     </div>
                 </footer>
                 <GdprBanner />

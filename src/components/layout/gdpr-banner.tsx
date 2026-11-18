@@ -55,7 +55,7 @@ export default function GdprBanner() {
                         <div className="flex gap-2 shrink-0">
                             <button
                                 // eslint-disable-next-line max-len
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium transition-colors cursor-pointer"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-brand-500 hover:bg-brand-400 text-gray-950 text-sm font-medium transition-colors cursor-pointer"
                                 onClick={acceptAnalyticsConsent}
                                 type="button"
                             >

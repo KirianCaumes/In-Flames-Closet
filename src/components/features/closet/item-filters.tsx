@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import classNames from 'classnames'
-import { buildClosetUrl, DEFAULT_FILTERS, DEFAULT_LIMIT, hasActiveClosetFilters, toggleFilterValue, type Filters } from 'lib/catalog/query'
-import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
+import { buildClosetUrl, DEFAULT_FILTERS, hasActiveClosetFilters, toggleFilterValue, type Filters } from 'lib/catalog/query'
+import { getAlbumDisplay } from 'lib/display/taxonomy'
 import type { Params } from 'lib/catalog/data'
 
 interface ItemFiltersProps {
@@ -12,23 +13,23 @@ interface ItemFiltersProps {
     readonly filters: Filters
     /** Available filter options */
     readonly params: Params
+    /** Number of results shown on the current page */
+    readonly shown: number
     /** Total number of matching results */
     readonly total: number
+    /** Total number of archived items, ignoring filters */
+    readonly archivedCount: number
     /** Callback to update filters and sync to URL */
     readonly onFiltersChange: (next: Partial<Filters>, type: 'push' | 'replace') => void
 }
 
 /**
- * Collapsible filter sidebar for the items archive.
+ * Release strip, search / sort toolbar and category chips for the items archive.
  * Syncs state to URL query parameters via router.push.
- * @returns The rendered filter sidebar with sections for title search, linked albums, years and categories, and a sort dropdown.
+ * @returns The rendered release strip and filters toolbar.
  */
-export default function ItemFilters({ filters, params, total, onFiltersChange }: ItemFiltersProps) {
+export default function ItemFilters({ filters, params, shown, total, archivedCount, onFiltersChange }: ItemFiltersProps) {
     const router = useRouter()
-
-    const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-
-    const [filterTypeOpen, setFilterTypeOpen] = useState<null | 'links' | 'categories'>('links')
 
     const buildUrl = useCallback((partial: Partial<Filters>): string => buildClosetUrl('/', { ...filters, ...partial }), [filters])
 
@@ -39,280 +40,209 @@ export default function ItemFilters({ filters, params, total, onFiltersChange }:
     const isFiltered = hasActiveClosetFilters(filters)
 
     return (
-        <aside className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
-            {/* Mobile toggle */}
-            <div className="flex items-center justify-between">
-                <button
-                    className="lg:hidden flex items-center gap-1.5 cursor-pointer"
-                    onClick={() => {
-                        setIsFiltersOpen(prev => !prev)
-                    }}
-                    type="button"
-                >
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Filters</p>
+        <>
+            {params.links.length > 0 && (
+                <section className="flex flex-col gap-2.5 pt-5 border-t border-gray-800">
+                    <h2 className="text-[13px] font-medium text-gray-400">Browse by release</h2>
+                    {/* eslint-disable-next-line max-len */}
+                    <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-color:var(--color-gray-700)_transparent] text-[11px] text-gray-400 text-center tabular-nums">
+                        <button
+                            aria-pressed={filters.links.length === 0}
+                            className="shrink-0 flex flex-col items-center gap-1 text-gray-100 cursor-pointer"
+                            onClick={() => {
+                                onFiltersChange({ links: [], page: 1 }, 'push')
+                            }}
+                            type="button"
+                        >
+                            <span
+                                className={classNames(
+                                    'size-13 rounded-lg border-2 flex items-center justify-center text-[13px] font-medium',
+                                    filters.links.length === 0 ? 'border-brand-500' : 'border-gray-700',
+                                )}
+                            >
+                                All
+                            </span>
+                            <span>{archivedCount}</span>
+                        </button>
+                        {params.links.map(link => {
+                            const album = getAlbumDisplay(link)
+                            const isActive = filters.links.includes(link)
+                            return (
+                                <button
+                                    aria-pressed={isActive}
+                                    className={classNames(
+                                        'shrink-0 flex flex-col items-center gap-1 cursor-pointer hover:text-gray-100 transition-colors',
+                                        { 'text-gray-100': isActive },
+                                    )}
+                                    key={link}
+                                    onClick={() => {
+                                        onFiltersChange({ links: toggleFilterValue(filters.links, link), page: 1 }, 'push')
+                                    }}
+                                    onMouseEnter={() => {
+                                        router.prefetch(buildUrl({ links: toggleFilterValue(filters.links, link), page: 1 }))
+                                    }}
+                                    title={link}
+                                    type="button"
+                                >
+                                    {album.cover ? (
+                                        <Image
+                                            alt={link}
+                                            className={classNames(
+                                                'size-13 rounded-lg border-2 object-cover',
+                                                isActive ? 'border-brand-500' : 'border-transparent',
+                                            )}
+                                            height={52}
+                                            src={album.cover}
+                                            width={52}
+                                        />
+                                    ) : (
+                                        <span
+                                            className={classNames(
+                                                'size-13 rounded-lg border-2 bg-gray-900 flex items-center justify-center p-1 leading-tight',
+                                                isActive ? 'border-brand-500' : 'border-gray-800',
+                                            )}
+                                        >
+                                            {album.shortLabel}
+                                        </span>
+                                    )}
+                                    <span>{album.year}</span>
+                                </button>
+                            )
+                        })}
+                    </div>
+                </section>
+            )}
+
+            <section
+                aria-label="Search and filters"
+                className="flex flex-wrap items-center gap-3"
+            >
+                <div className="relative flex-[999_1_280px] min-w-0">
+                    <label
+                        className="sr-only"
+                        htmlFor="filter-title"
+                    >
+                        Search items
+                    </label>
                     <svg
-                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                        className="absolute left-3.5 top-3.5 size-4 text-gray-400 pointer-events-none"
                         fill="none"
                         stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeWidth={1.8}
                         viewBox="0 0 24 24"
                     >
-                        <path
-                            d="M19 9l-7 7-7-7"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
+                        <circle
+                            cx="11"
+                            cy="11"
+                            r="6.5"
                         />
+                        <path d="M16 16l4.5 4.5" />
                     </svg>
-                </button>
-                <p className="hidden lg:block text-xs font-display font-semibold text-gray-400 uppercase tracking-widest">Filters</p>
-
-                <button
-                    // eslint-disable-next-line max-len
-                    className="text-xs text-brand-500 hover:text-brand-400 transition-colors font-medium px-2 py-1 rounded-lg hover:bg-brand-500/10 cursor-pointer disabled:text-gray-600 disabled:hover:bg-transparent disabled:cursor-not-allowed"
-                    disabled={!isFiltered}
-                    onClick={reset}
-                    type="button"
-                >
-                    Reset all
-                </button>
-            </div>
-
-            {/* Filter body */}
-            <div
-                className={classNames(
-                    'overflow-hidden transition-[max-height] duration-300 ease-in-out lg:!max-h-none',
-                    isFiltersOpen ? 'max-h-[1200px]' : 'max-h-0',
-                )}
-            >
-                <div className="space-y-4  mt-2">
-                    {/* Results summary + sort */}
-                    <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-gray-500">
-                            {Math.min(DEFAULT_LIMIT, total)} of {total} result(s)
-                        </span>
-                        <select
-                            // eslint-disable-next-line max-len
-                            className="text-xs bg-gray-800 border border-gray-700 text-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-brand-500 cursor-pointer"
-                            onChange={({ target }) => {
-                                onFiltersChange({ sort: target.value as Filters['sort'], page: 1 }, 'push')
+                    <input
+                        // eslint-disable-next-line max-len
+                        className="w-full h-11 pl-10 pr-11 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-brand-500 [&::-webkit-calendar-picker-indicator]:!hidden"
+                        id="filter-title"
+                        onChange={({ target }) => {
+                            onFiltersChange({ title: target.value, page: 1 }, filters.title ? 'replace' : 'push')
+                        }}
+                        placeholder="Search a title, e.g. jesterhead"
+                        type="text"
+                        value={filters.title}
+                    />
+                    {filters.title && (
+                        <button
+                            aria-label={`Clear ${filters.title.toLowerCase()}`}
+                            className="absolute right-0 top-0 size-11 flex items-center justify-center text-gray-400 hover:text-gray-100 cursor-pointer"
+                            onClick={() => {
+                                onFiltersChange({ title: '', page: 1 }, 'push')
                             }}
-                            value={filters.sort}
+                            type="button"
                         >
-                            <option value="new">Newly added</option>
-                            <option value="old">Formerly added</option>
-                        </select>
-                    </div>
+                            <svg
+                                className="size-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M6 18L18 6M6 6l12 12"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                />
+                            </svg>
+                        </button>
+                    )}
+                </div>
 
-                    {/* Title search */}
-                    <div>
-                        <label
-                            className="block text-xs text-gray-400 font-medium mb-1"
-                            htmlFor="filter-title"
-                        >
-                            Title
-                        </label>
-                        <div className="relative">
-                            <input
-                                // eslint-disable-next-line max-len
-                                className="w-full bg-gray-800 border border-gray-700 text-gray-200 placeholder-gray-600 rounded-xl px-3 py-2 text-sm pr-9 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all [&::-webkit-calendar-picker-indicator]:!hidden"
-                                id="filter-title"
-                                onChange={({ target }) => {
-                                    onFiltersChange({ title: target.value, page: 1 }, filters.title ? 'replace' : 'push')
-                                }}
-                                placeholder="Search title..."
-                                type="text"
-                                value={filters.title}
-                            />
-                            {filters.title ? (
+                <div className="flex-[1_1_170px]">
+                    <label
+                        className="sr-only"
+                        htmlFor="filter-sort"
+                    >
+                        Sort
+                    </label>
+                    <select
+                        // eslint-disable-next-line max-len
+                        className="w-full h-11 px-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:border-brand-500 cursor-pointer"
+                        id="filter-sort"
+                        onChange={({ target }) => {
+                            onFiltersChange({ sort: target.value as Filters['sort'], page: 1 }, 'push')
+                        }}
+                        value={filters.sort}
+                    >
+                        <option value="new">Newly added</option>
+                        <option value="old">Formerly added</option>
+                    </select>
+                </div>
+
+                <p className="text-[13px] text-gray-400 whitespace-nowrap">
+                    <span className="tabular-nums text-gray-100">{shown}</span> of <span className="tabular-nums">{total}</span> items
+                </p>
+
+                {isFiltered && (
+                    <button
+                        className="min-h-11 text-[13px] text-brand-500 hover:text-brand-400 transition-colors cursor-pointer"
+                        onClick={reset}
+                        type="button"
+                    >
+                        Reset filters
+                    </button>
+                )}
+
+                {params.categories.length > 0 && (
+                    <div
+                        aria-label="Categories"
+                        className="basis-full flex flex-wrap gap-2"
+                        role="group"
+                    >
+                        {params.categories.map(category => {
+                            const isActive = filters.categories.includes(category)
+                            return (
                                 <button
-                                    aria-label={`Clear ${filters.title.toLowerCase()}`}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-500 cursor-pointer"
+                                    aria-pressed={isActive}
+                                    className={classNames(
+                                        'min-h-11 px-3 rounded border text-[13px] transition-colors cursor-pointer',
+                                        isActive ? 'border-brand-500 text-brand-500' : 'border-gray-800 text-gray-400 hover:text-gray-100',
+                                    )}
+                                    key={category}
                                     onClick={() => {
-                                        onFiltersChange({ title: '', page: 1 }, 'push')
+                                        onFiltersChange({ categories: toggleFilterValue(filters.categories, category), page: 1 }, 'push')
+                                    }}
+                                    onMouseEnter={() => {
+                                        router.prefetch(buildUrl({ categories: toggleFilterValue(filters.categories, category), page: 1 }))
                                     }}
                                     type="button"
                                 >
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            d="M6 18L18 6M6 6l12 12"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                        />
-                                    </svg>
+                                    {category}
                                 </button>
-                            ) : (
-                                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                        />
-                                    </svg>
-                                </span>
-                            )}
-                        </div>
+                            )
+                        })}
                     </div>
-
-                    {/* Linked to (album) */}
-                    {params.links.length > 0 && (
-                        <>
-                            <button
-                                // eslint-disable-next-line max-len
-                                className="w-full flex items-center justify-between text-xs font-medium text-gray-400 cursor-pointer hover:text-gray-200 transition-colors mb-0"
-                                onClick={() => {
-                                    setFilterTypeOpen(prev => (prev === 'links' ? null : 'links'))
-                                }}
-                                type="button"
-                            >
-                                <span>Linked to</span>
-                                <svg
-                                    className={classNames(
-                                        'w-3.5 h-3.5 transition-transform duration-200',
-                                        filterTypeOpen === 'links' ? 'rotate-180' : '',
-                                    )}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        d="M19 9l-7 7-7-7"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                    />
-                                </svg>
-                            </button>
-                            <div
-                                className={classNames(
-                                    'overflow-hidden transition-[max-height] duration-300 ease-in-out',
-                                    filterTypeOpen === 'links' ? 'max-h-[1200px]' : 'max-h-0',
-                                )}
-                            >
-                                <div className="space-y-1.5 pt-2">
-                                    {params.links.map(link => (
-                                        <label
-                                            className="flex items-center gap-2 group cursor-pointer"
-                                            key={link}
-                                            onMouseEnter={() => {
-                                                router.prefetch(
-                                                    buildUrl({
-                                                        links: toggleFilterValue(filters.links, link),
-                                                        page: 1,
-                                                    }),
-                                                )
-                                            }}
-                                        >
-                                            <input
-                                                checked={filters.links.includes(link)}
-                                                className="w-4 h-4 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer min-w-4"
-                                                onChange={() => {
-                                                    onFiltersChange(
-                                                        {
-                                                            links: toggleFilterValue(filters.links, link),
-                                                            page: 1,
-                                                        },
-                                                        'push',
-                                                    )
-                                                }}
-                                                type="checkbox"
-                                            />
-                                            {getAlbumDisplay(link).icon}
-                                            <span className="text-sm transition-colors truncate text-gray-400 group-hover:text-gray-200">
-                                                {link}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    {/* Categories */}
-                    {params.categories.length > 0 && (
-                        <>
-                            <button
-                                // eslint-disable-next-line max-len
-                                className="w-full flex items-center justify-between text-xs font-medium text-gray-400 cursor-pointer hover:text-gray-200 transition-colors mb-0"
-                                onClick={() => {
-                                    setFilterTypeOpen(prev => (prev === 'categories' ? null : 'categories'))
-                                }}
-                                type="button"
-                            >
-                                <span>Categories</span>
-                                <svg
-                                    className={`w-3.5 h-3.5 transition-transform duration-200 ${filterTypeOpen === 'categories' ? 'rotate-180' : ''}`}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        d="M19 9l-7 7-7-7"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                    />
-                                </svg>
-                            </button>
-                            <div
-                                className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-                                    filterTypeOpen === 'categories' ? 'max-h-[1200px]' : 'max-h-0'
-                                }`}
-                            >
-                                <div className="space-y-1.5 pt-2">
-                                    {params.categories.map(category => (
-                                        <label
-                                            className="flex items-center gap-2 group cursor-pointer"
-                                            key={category}
-                                            onMouseEnter={() => {
-                                                router.prefetch(
-                                                    buildUrl({
-                                                        categories: toggleFilterValue(filters.categories, category),
-                                                        page: 1,
-                                                    }),
-                                                )
-                                            }}
-                                        >
-                                            <input
-                                                checked={filters.categories.includes(category)}
-                                                className="w-4 h-4 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer"
-                                                onChange={() => {
-                                                    onFiltersChange(
-                                                        {
-                                                            categories: toggleFilterValue(filters.categories, category),
-                                                            page: 1,
-                                                        },
-                                                        'push',
-                                                    )
-                                                }}
-                                                type="checkbox"
-                                            />
-                                            <span className="transition-colors flex items-center text-gray-400 group-hover:text-gray-200">
-                                                {getCategoryDisplay(category).icon}
-                                            </span>
-                                            <span className="text-sm transition-colors text-gray-400 group-hover:text-gray-200">
-                                                {category}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        </aside>
+                )}
+            </section>
+        </>
     )
 }
