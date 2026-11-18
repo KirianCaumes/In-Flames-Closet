@@ -77,7 +77,7 @@ export default function ItemCard({
                                     updateImageStatus(item.imagesId[0], 'resolved')
                                 }}
                                 priority={priority}
-                                sizes="(max-width: 447px) 100vw, (max-width: 663px) 50vw, (max-width: 879px) 33vw, 260px"
+                                sizes="(max-width: 447px) 100vw, (max-width: 679px) 50vw, (max-width: 895px) 33vw, (max-width: 1111px) 25vw, 234px"
                                 src={buildImageUrl({ folderId: item.folderId, imageId: item.imagesId[0] })}
                             />
                             {item.imagesId[1] && (
@@ -96,7 +96,7 @@ export default function ItemCard({
                                     onLoad={() => {
                                         updateImageStatus(item.imagesId[1], 'resolved')
                                     }}
-                                    sizes="(max-width: 447px) 100vw, (max-width: 663px) 50vw, (max-width: 879px) 33vw, 260px"
+                                    sizes="(max-width: 447px) 100vw, (max-width: 679px) 50vw, (max-width: 895px) 33vw, (max-width: 1111px) 25vw, 234px"
                                     src={buildImageUrl({ folderId: item.folderId, imageId: item.imagesId[1] })}
                                 />
                             )}

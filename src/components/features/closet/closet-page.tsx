@@ -1,17 +1,14 @@
 'use client'
 
-import Link from 'next/link'
 import { useOptimistic, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
 
 import classNames from 'classnames'
 import ItemCard from 'components/features/closet/item-card'
 import ItemFilters from 'components/features/closet/item-filters'
+import SiteHeader from 'components/layout/site-header'
 import Pagination from 'components/ui/pagination'
 import { buildClosetUrl, DEFAULT_FILTERS, filtersFromParams, type Filters } from 'lib/catalog/query'
-// eslint-disable-next-line no-restricted-imports
-import IconSvg from '../../../../public/favicon.svg'
 import type { Item, Params } from 'lib/catalog/data'
 
 interface ClosetPageProps {
@@ -60,47 +57,7 @@ export default function ClosetPage({ pagedItems, total, pages, archivedCount, pa
 
     return (
         <>
-            <header className="border-b border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center gap-x-7 gap-y-3">
-                    <Link
-                        className="inline-flex items-center gap-2.5 min-h-11"
-                        href="/"
-                    >
-                        <Image
-                            alt=""
-                            className="size-9 shrink-0"
-                            height={36}
-                            loading="eager"
-                            src={IconSvg as string}
-                            width={36}
-                        />
-                        <span className="font-display font-semibold text-[21px] text-gray-100">
-                            In Flames <span className="text-brand-500">Closet</span>
-                        </span>
-                    </Link>
-                    <div className="grow" />
-                    <nav
-                        aria-label="In Flames archives"
-                        className="flex border border-gray-800 rounded-lg overflow-hidden text-sm"
-                    >
-                        <Link
-                            aria-current="page"
-                            className="inline-flex items-center gap-2 min-h-11 px-3.5 bg-gray-800 text-gray-100 font-medium"
-                            href="/"
-                        >
-                            <span className="size-2 rounded-full bg-brand-500" />
-                            Closet
-                        </Link>
-                        <a
-                            className="inline-flex items-center gap-2 min-h-11 px-3.5 text-gray-400 hover:text-gray-100 transition-colors"
-                            href="https://in-flames-bootlegs.kiriancaumes.fr"
-                        >
-                            <span className="size-2 rounded-full bg-[#e6443d]" />
-                            Bootlegs
-                        </a>
-                    </nav>
-                </div>
-            </header>
+            <SiteHeader />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-12 flex flex-col gap-7 text-sm">
                 <section className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">

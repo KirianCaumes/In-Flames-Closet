@@ -23,6 +23,10 @@ interface ItemFiltersProps {
     readonly onFiltersChange: (next: Partial<Filters>, type: 'push' | 'replace') => void
 }
 
+/** On wide screens the release buttons shrink so the whole strip fits on one line. */
+const RELEASE_BUTTON = 'shrink-0 xl:shrink xl:flex-1 xl:min-w-0 xl:max-w-13 flex flex-col items-center gap-1'
+const RELEASE_TILE = 'size-13 xl:w-full xl:h-auto xl:aspect-square rounded-lg border-2'
+
 /**
  * Release strip, search / sort toolbar and category chips for the items archive.
  * Syncs state to URL query parameters via router.push.
@@ -44,11 +48,10 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
             {params.links.length > 0 && (
                 <section className="flex flex-col gap-2.5 pt-5 border-t border-gray-800">
                     <h2 className="text-[13px] font-medium text-gray-400">Browse by release</h2>
-                    {/* eslint-disable-next-line max-len */}
-                    <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-color:var(--color-gray-700)_transparent] text-[11px] text-gray-400 text-center tabular-nums">
+                    <div className="flex flex-wrap xl:flex-nowrap gap-x-2 gap-y-3 text-[11px] text-gray-400 text-center tabular-nums">
                         <button
                             aria-pressed={filters.links.length === 0}
-                            className="shrink-0 flex flex-col items-center gap-1 text-gray-100 cursor-pointer"
+                            className={`${RELEASE_BUTTON} text-gray-100 cursor-pointer`}
                             onClick={() => {
                                 onFiltersChange({ links: [], page: 1 }, 'push')
                             }}
@@ -56,7 +59,7 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
                         >
                             <span
                                 className={classNames(
-                                    'size-13 rounded-lg border-2 flex items-center justify-center text-[13px] font-medium',
+                                    `${RELEASE_TILE} flex items-center justify-center text-[13px] font-medium`,
                                     filters.links.length === 0 ? 'border-brand-500' : 'border-gray-700',
                                 )}
                             >
@@ -64,7 +67,7 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
                             </span>
                             <span>{archivedCount}</span>
                         </button>
-                        {/* Releases without a cover first, so they are not hidden at the end of the scroll */}
+                        {/* Releases without a cover first */}
                         {params.links
                             .toSorted((a, b) => Number(!!getAlbumDisplay(a).cover) - Number(!!getAlbumDisplay(b).cover))
                             .map(link => {
@@ -73,10 +76,9 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
                                 return (
                                     <button
                                         aria-pressed={isActive}
-                                        className={classNames(
-                                            'shrink-0 flex flex-col items-center gap-1 cursor-pointer hover:text-gray-100 transition-colors',
-                                            { 'text-gray-100': isActive },
-                                        )}
+                                        className={classNames(`${RELEASE_BUTTON} cursor-pointer hover:text-gray-100 transition-colors`, {
+                                            'text-gray-100': isActive,
+                                        })}
                                         key={link}
                                         onClick={() => {
                                             onFiltersChange({ links: toggleFilterValue(filters.links, link), page: 1 }, 'push')
@@ -91,7 +93,7 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
                                             <Image
                                                 alt={link}
                                                 className={classNames(
-                                                    'size-13 rounded-lg border-2 object-cover',
+                                                    `${RELEASE_TILE} object-cover`,
                                                     isActive ? 'border-brand-500' : 'border-transparent',
                                                 )}
                                                 height={52}
@@ -101,7 +103,7 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
                                         ) : (
                                             <span
                                                 className={classNames(
-                                                    'size-13 rounded-lg border-2 bg-gray-900 flex items-center justify-center p-1 leading-tight',
+                                                    `${RELEASE_TILE} bg-gray-900 flex items-center justify-center p-1 leading-tight`,
                                                     isActive ? 'border-brand-500' : 'border-gray-800',
                                                 )}
                                             >

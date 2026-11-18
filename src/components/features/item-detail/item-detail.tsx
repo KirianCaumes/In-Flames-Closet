@@ -5,11 +5,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import SiteHeader from 'components/layout/site-header'
 import { DefaultThumbnail } from 'components/ui/default-thumbnail'
 import { buildImageUrl, createImageStatusUpdater } from 'lib/image/identity'
 import { buildItemDetailUrl } from 'lib/projection/item'
 import { buildFilterUrl } from 'lib/catalog/query'
-import { getAlbumDisplay, getCategoryDisplay } from 'lib/display/taxonomy'
+import { getAlbumDisplay } from 'lib/display/taxonomy'
 import type { Item } from 'lib/catalog/data'
 import type { ImageStatus } from 'lib/image/identity'
 
@@ -31,13 +32,15 @@ export default function ItemDetail({ item }: ItemDetailProps) {
 
     return (
         <div className="min-h-screen">
-            {/* ── Header ─────────────────────────────────────────────── */}
-            <header className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
+            <SiteHeader />
+
+            {/* ── Content ────────────────────────────────────────────── */}
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-12">
+                <div className="flex items-center gap-3 mb-6">
                     <button
                         aria-label="Back to archive"
                         // eslint-disable-next-line max-len
-                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                        className="inline-flex items-center justify-center size-11 rounded-lg border border-gray-800 text-gray-400 hover:text-gray-100 transition-colors cursor-pointer"
                         onClick={() => {
                             router.back()
                         }}
@@ -83,15 +86,11 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                         <span className="truncate text-gray-200">{item.title || 'Unknown'}</span>
                     </nav>
                 </div>
-            </header>
-
-            {/* ── Content ────────────────────────────────────────────── */}
-            <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left - image carousel */}
                     <div className="w-full lg:w-1/2 space-y-3">
                         {/* Main image */}
-                        <div className="relative bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden aspect-square">
+                        <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-square">
                             <DefaultThumbnail />
                             {/* Main image */}
                             {item.imagesId.map(
@@ -113,7 +112,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                                 updateImageStatus(`main-${i}`, 'resolved')
                                             }}
                                             priority={i === 0}
-                                            sizes="(max-width: 1023px) 100vw, (max-width: 1151px) 50vw, 550px"
+                                            sizes="(max-width: 1023px) 100vw, (max-width: 1327px) 50vw, 616px"
                                             src={buildImageUrl({ folderId: item.folderId, imageId })}
                                         />
                                     ),
@@ -125,7 +124,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                     <button
                                         aria-label="Previous image"
                                         // eslint-disable-next-line max-len
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-gray-900/80 hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-gray-900/80 hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
                                         onClick={() => {
                                             setActiveIndex(prev => (prev === 0 ? item.imagesId.length - 1 : prev - 1))
                                         }}
@@ -148,7 +147,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                     <button
                                         aria-label="Next image"
                                         // eslint-disable-next-line max-len
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-gray-900/80 hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-gray-900/80 hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
                                         onClick={() => {
                                             setActiveIndex(prev => (prev === item.imagesId.length - 1 ? 0 : prev + 1))
                                         }}
@@ -197,7 +196,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                 {item.imagesId.map((imgId, i) => (
                                     <button
                                         className={classNames(
-                                            'relative shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-colors cursor-pointer',
+                                            'relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors cursor-pointer',
                                             {
                                                 'border-brand-500': i === activeIndex,
                                                 'border-gray-700 hover:border-gray-500': i !== activeIndex,
@@ -243,7 +242,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                     <div className="flex-1 space-y-5">
                         {/* Title + share */}
                         <div className="flex items-start gap-3">
-                            <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-100 leading-tight flex-1">
+                            <h1 className="text-[28px] sm:text-[34px] font-display font-semibold text-gray-50 leading-[1.15] flex-1">
                                 {item.title || 'Unknown'}
                             </h1>
                             {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
@@ -251,7 +250,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                 <button
                                     aria-label="Share"
                                     // eslint-disable-next-line max-len
-                                    className="shrink-0 w-9 h-9 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+                                    className="shrink-0 w-9 h-9 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
                                     onClick={async () => {
                                         try {
                                             await navigator.share({
@@ -282,7 +281,7 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                         </div>
 
                         {/* Metadata rows */}
-                        <dl className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden divide-y divide-gray-800">
+                        <dl className="border-y border-gray-800 divide-y divide-gray-800">
                             {[
                                 { label: 'Category', value: item.category, href: buildFilterUrl('categories', item.category) },
                                 { label: 'Year', value: item.year, href: buildFilterUrl('years', item.year) },
@@ -293,14 +292,11 @@ export default function ItemDetail({ item }: ItemDetailProps) {
                                 .filter(row => row.value)
                                 .map(row => (
                                     <div
-                                        className="flex items-center gap-3 px-4 py-3"
+                                        className="flex items-center gap-3 min-h-11 py-2"
                                         key={row.label}
                                     >
-                                        <dt className="text-xs font-semibold text-gray-500 w-24 shrink-0">{row.label}</dt>
-                                        <dd className="flex items-center gap-2 text-sm text-gray-300 min-w-0">
-                                            {row.label === 'Category' && (
-                                                <span className="text-gray-400">{getCategoryDisplay(row.value).icon}</span>
-                                            )}
+                                        <dt className="text-[13px] text-gray-400 w-24 shrink-0">{row.label}</dt>
+                                        <dd className="flex items-center gap-2 text-sm text-gray-100 min-w-0">
                                             {row.label === 'Linked to' && getAlbumDisplay(row.value).icon}
                                             {row.href ? (
                                                 <Link
@@ -320,14 +316,14 @@ export default function ItemDetail({ item }: ItemDetailProps) {
 
                         {/* Comment */}
                         {item.comment && (
-                            <div className="bg-yellow-400/5 border border-yellow-400/20 rounded-2xl p-4">
+                            <div className="bg-yellow-400/5 border border-yellow-400/20 rounded-lg p-4">
                                 <p className="text-sm text-yellow-300 italic leading-relaxed">{item.comment}</p>
                             </div>
                         )}
 
                         {/* Report link */}
                         <a
-                            className="inline-flex items-center gap-2 text-xs text-gray-500 hover:text-brand-400 transition-colors"
+                            className="inline-flex items-center gap-2 min-h-11 text-[13px] text-gray-400 hover:text-brand-400 transition-colors"
                             // eslint-disable-next-line max-len
                             href={`mailto:ajesterscollection@gmail.com?subject=${encodeURIComponent(`[In Flames Closet] Problem with ${item.title} (${item.folderId})`)}&body=${encodeURIComponent(`Hello,\nI think there is a problem with the item "${item.title}" (${item.folderId}):\n`)}`}
                         >

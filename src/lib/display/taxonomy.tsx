@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import CategoryIcon from 'components/ui/category-icon'
 import albums from 'lib/display/albums'
 import type { ReactNode } from 'react'
 
@@ -23,8 +22,6 @@ export interface CategoryDisplay {
     name: string
     /** Safe label for missing values. */
     label: string
-    /** Icon node used next to the category label. */
-    icon: ReactNode
 }
 
 /**
@@ -81,7 +78,6 @@ export function getCategoryDisplay(name: string): CategoryDisplay {
     return {
         name,
         label: name || 'Unknown',
-        icon: <CategoryIcon name={name} />,
     }
 }
 
