@@ -81,7 +81,7 @@ export default function ClosetPage({ pagedItems, total, pages, archivedCount, pa
                     <div className="grow" />
                     <nav
                         aria-label="In Flames archives"
-                        className="flex border border-gray-800 rounded-lg overflow-hidden"
+                        className="flex border border-gray-800 rounded-lg overflow-hidden text-sm"
                     >
                         <Link
                             aria-current="page"
