@@ -64,51 +64,54 @@ export default function ItemFilters({ filters, params, shown, total, archivedCou
                             </span>
                             <span>{archivedCount}</span>
                         </button>
-                        {params.links.map(link => {
-                            const album = getAlbumDisplay(link)
-                            const isActive = filters.links.includes(link)
-                            return (
-                                <button
-                                    aria-pressed={isActive}
-                                    className={classNames(
-                                        'shrink-0 flex flex-col items-center gap-1 cursor-pointer hover:text-gray-100 transition-colors',
-                                        { 'text-gray-100': isActive },
-                                    )}
-                                    key={link}
-                                    onClick={() => {
-                                        onFiltersChange({ links: toggleFilterValue(filters.links, link), page: 1 }, 'push')
-                                    }}
-                                    onMouseEnter={() => {
-                                        router.prefetch(buildUrl({ links: toggleFilterValue(filters.links, link), page: 1 }))
-                                    }}
-                                    title={link}
-                                    type="button"
-                                >
-                                    {album.cover ? (
-                                        <Image
-                                            alt={link}
-                                            className={classNames(
-                                                'size-13 rounded-lg border-2 object-cover',
-                                                isActive ? 'border-brand-500' : 'border-transparent',
-                                            )}
-                                            height={52}
-                                            src={album.cover}
-                                            width={52}
-                                        />
-                                    ) : (
-                                        <span
-                                            className={classNames(
-                                                'size-13 rounded-lg border-2 bg-gray-900 flex items-center justify-center p-1 leading-tight',
-                                                isActive ? 'border-brand-500' : 'border-gray-800',
-                                            )}
-                                        >
-                                            {album.shortLabel}
-                                        </span>
-                                    )}
-                                    <span>{album.year}</span>
-                                </button>
-                            )
-                        })}
+                        {/* Releases without a cover first, so they are not hidden at the end of the scroll */}
+                        {params.links
+                            .toSorted((a, b) => Number(!!getAlbumDisplay(a).cover) - Number(!!getAlbumDisplay(b).cover))
+                            .map(link => {
+                                const album = getAlbumDisplay(link)
+                                const isActive = filters.links.includes(link)
+                                return (
+                                    <button
+                                        aria-pressed={isActive}
+                                        className={classNames(
+                                            'shrink-0 flex flex-col items-center gap-1 cursor-pointer hover:text-gray-100 transition-colors',
+                                            { 'text-gray-100': isActive },
+                                        )}
+                                        key={link}
+                                        onClick={() => {
+                                            onFiltersChange({ links: toggleFilterValue(filters.links, link), page: 1 }, 'push')
+                                        }}
+                                        onMouseEnter={() => {
+                                            router.prefetch(buildUrl({ links: toggleFilterValue(filters.links, link), page: 1 }))
+                                        }}
+                                        title={link}
+                                        type="button"
+                                    >
+                                        {album.cover ? (
+                                            <Image
+                                                alt={link}
+                                                className={classNames(
+                                                    'size-13 rounded-lg border-2 object-cover',
+                                                    isActive ? 'border-brand-500' : 'border-transparent',
+                                                )}
+                                                height={52}
+                                                src={album.cover}
+                                                width={52}
+                                            />
+                                        ) : (
+                                            <span
+                                                className={classNames(
+                                                    'size-13 rounded-lg border-2 bg-gray-900 flex items-center justify-center p-1 leading-tight',
+                                                    isActive ? 'border-brand-500' : 'border-gray-800',
+                                                )}
+                                            >
+                                                {album.shortLabel}
+                                            </span>
+                                        )}
+                                        <span>{album.year}</span>
+                                    </button>
+                                )
+                            })}
                     </div>
                 </section>
             )}

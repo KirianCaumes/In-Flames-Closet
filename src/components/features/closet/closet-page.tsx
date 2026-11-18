@@ -60,7 +60,7 @@ export default function ClosetPage({ pagedItems, total, pages, archivedCount, pa
 
     return (
         <>
-            <header className="border-b border-gray-800 text-sm">
+            <header className="border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center gap-x-7 gap-y-3">
                     <Link
                         className="inline-flex items-center gap-2.5 min-h-11"
